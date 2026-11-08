@@ -8,14 +8,14 @@ platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [debugging, tdd, verification, code-review, tla-plus, workflow]
-    related_skills: [systematic-debugging, test-driven-development, requesting-code-review, github, grill-me, simplify-code, impeccable, vercel-react-native-skills]
+    related_skills: [systematic-debugging, test-driven-development, requesting-code-review, github, grill-me, simplify-code, impeccable, vercel-react-native-skills, animate-expo, break-ui, mobile-native, emil-design-eng, write-swift]
 ---
 
 # Rigorous Development Workflow (`/rigorous-dev`)
 
 ## When to Use
 
-Use when fixing bugs, adding features, or running a multi-agent engineering workflow that requires root-cause reproduction, anti-regression tests/lints, real verification evidence, and independent review. Load `systematic-debugging`, `test-driven-development`, `requesting-code-review`, `github`, `grill-me`, `simplify-code`, `impeccable`, or `vercel-react-native-skills` via `skill_view` whenever deeper step-by-step guidance is needed.
+Use when fixing bugs, adding features, or running a multi-agent engineering workflow that requires root-cause reproduction, anti-regression tests/lints, real verification evidence, and independent review. Load `systematic-debugging`, `test-driven-development`, `requesting-code-review`, `github`, `grill-me`, `simplify-code`, `impeccable`, `emil-design-eng`, `vercel-react-native-skills`, `animate-expo`, `break-ui`, `mobile-native`, or `write-swift` via `skill_view` whenever deeper step-by-step guidance is needed.
 
 ## Hard Rules
 
@@ -37,7 +37,7 @@ Use when fixing bugs, adding features, or running a multi-agent engineering work
 
 4. **Mandatory Real Execution & UI Geometry Evidence**
    - Never claim completion from static inspection alone. Run the project's actual build, typecheck, and test suite (or `hermes verify`) and capture real command output as proof.
-   - For React Native / Web UI changes, follow `vercel-react-native-skills` and `impeccable` (stick to theme tokens, no ad-hoc magic numbers), and verify layout via UI hierarchy `bounds` (`uiautomator dump`) or DOM `getBoundingClientRect` before capturing final screenshots.
+   - For React Native / Web / iOS UI changes, follow `vercel-react-native-skills`, `animate-expo` (frequency gate: no animation on 100+/day actions; keep motion on the UI thread), `mobile-native` (`100dvh`, `@media (hover: hover)`, 16px inputs), `write-swift` (Swift 6 approachable concurrency & value types), and `impeccable` / `emil-design-eng` (theme tokens, `ease-out` <300ms, never `scale(0)`). Stress-test rendered fields with `break-ui` worst-case data (long compound strings, 0/1/1000 items, unbreakable emails/URLs) and verify layout via UI hierarchy `bounds` (`uiautomator dump`) or DOM `getBoundingClientRect` before capturing final screenshots.
 
 5. **Role Separation, Two-Stage Review & Safe Delivery**
    - Follow the configured roles: Argon leads architecture, coupled edits, and visual alignment;

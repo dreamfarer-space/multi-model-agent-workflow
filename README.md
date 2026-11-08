@@ -76,8 +76,8 @@
 1. **耦合代码 1 人主刀，严禁碎裂并发写**：
    - 相互接线的 UI 组件、Store 状态同步、路由导航，**必须由主窗口 `Argon` 自己一刀改完**（完全独立的模块最多派 1~2 个带 `worktree_isolation: true` 的子智能体）。
    - 多国语言字典（如 7 个 `locales/*.ts`）由 `Argon` 改好主语言后，**只派 1 个 `Gemini 3.8 Flash` 子智能体一次性同步其余语言**，严禁拆成多个并发写任务。
-2. **设计 Token 铁律与 `// WHY:` 注释规范**：
-   - 前端/React Native 严格遵循 `vercel-react-native-skills` 与 `impeccable`：只准引用 `theme.ts` / `DESIGN.md` 中的语义 Token，禁止手写 `#hex` 颜色与魔法数字。
+2. **设计 Token 铁律、动效频率门禁与 `// WHY:` 注释规范**：
+   - 前端/移动端严格遵循 `vercel-react-native-skills`、`animate-expo`、`mobile-native`、`write-swift`（iOS Swift 6 并发与值类型）以及 `impeccable` / `emil-design-eng`：只准引用 `theme.ts` / `DESIGN.md` 中的语义 Token，禁止手写 `#hex` 颜色与魔法数字；**高频动作（100+ 次/天，如切 Tab、开关键盘、快捷键面板）一律 `animation: 'none'`**，动效只走 GPU `transform`/`opacity`（<300ms `ease-out`，严禁 `scale(0)`）。
    - **禁止写复述代码表面意思的废话注释**（如 `// 更新状态`）；**强制保留解释平台特殊坑或协议边界的 `// WHY:` 护栏注释**（防止后续智能体误删保命逻辑）。
 3. **两轮不过立即掀桌（Two-Strike Reset Rule）**：
    - 同一个 Bug 如果连续修改 **2 轮** 仍未通过测试，**立即停止原地叠第 3 层补丁**！
@@ -88,8 +88,9 @@
    - 涉及断线重连、选中态回写、轮询竞态、权限审批，先将状态转换抽离为纯逻辑，跑无头随机序列测试（如乱序组合 `连上 → 断网 → 切会话 → 删除 → 迟到响应`）或 TLA+ 模型检验，1 秒内验证状态不变量。
 2. **第 2 层：构建、类型与目标回归**
    - 运行目标包的 `check`、`test` 与构建产物校验脚本，必须取得真实 Exit Code 0 输出。
-3. **第 3 层：UI 几何结构树算坐标 → 最终截图**
-   - **结构树 = 事实，几何 = 度量，截图 = 证据**：先通过 Android `uiautomator dump` 检查控件 `bounds=[x1,y1][x2,y2]`（或 Web DOM `getBoundingClientRect`），确认无横向溢出、无文字截断、软键盘弹出后输入框仍在可见区域内；
+3. **第 3 层：`break-ui` 极限脏数据压测 + UI 几何结构树算坐标 → 最终截图**
+   - **先喂最坏真实数据（`break-ui`）**：用 30 字符德语复合词、65 字符无空格长邮箱、单字母短名、`0 / 1 / 1,000+` 条列表数据压测组件，排查 `min-width: 0` 缺失、头像挤压与多语言爆框；
+   - **结构树 = 事实，几何 = 度量，截图 = 证据**：再通过 Android `uiautomator dump` 检查控件 `bounds=[x1,y1][x2,y2]`（或 Web DOM `getBoundingClientRect`），确认无横向溢出、无文字截断、软键盘弹出后输入框仍在可见区域内；
    - 几何校验通过后，再截出明/暗主题画面由 `Argon` 视觉把关（严禁在截图中暴露个人用户名或本地私密路径）。
 
 ### 第 4 步：代码瘦身 + 异血统两阶段盲审
@@ -141,6 +142,10 @@ hermes skills repair-official --restore -y subagent-driven-development
 # 社区顶流技能安装
 hermes skills install -y --category software-development vercel-labs/agent-skills/skills/react-native-skills
 hermes skills install -y --category software-development mattpocock/skills/skills/engineering/improve-codebase-architecture
+hermes skills install -y --category software-development emilkowalski/skills/skills/animate-expo
+hermes skills install -y --category software-development emilkowalski/skills/skills/mobile-native
+hermes skills install -y --category software-development emilkowalski/skills/skills/write-swift
+hermes skills install -y --category creative emilkowalski/skills/skills/emil-design-eng
 hermes skills install -y --category creative pbakaus/impeccable/.hermes/skills/impeccable
 hermes skills install -y --category creative anthropics/skills/skills/frontend-design
 ```

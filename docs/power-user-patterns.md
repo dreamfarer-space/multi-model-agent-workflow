@@ -49,14 +49,17 @@
 
 > **核心分层：结构树 = 事实，几何坐标 = 度量，截图 = 最终证据。**
 
-1. **Token 单一来源（Tokens are Law）**：
+1. **Token 单一来源与动效频率门禁（Tokens & Frequency Gate）**：
    - 颜色、字号、圆角、间距必须取自 `theme.ts` / `DESIGN.md` 语义 Token，禁止在业务组件中手写 `#hex` 颜色或魔法数字。
-2. **三步递进验证**：
+   - **Emil Kowalski 频率门禁（`emil-design-eng` / `animate-expo`）**：100+ 次/天的高频操作（切 Tab、开关软键盘、命令面板）**严禁加动画（`animation: 'none'`）**；其余 UI 动效控制在 300ms 内，进入/退出一律用强 `ease-out`（严禁 `ease-in` 与 `scale(0)`），React Native 手势与动效必须留在 UI Worklet 线程（禁止在 `onUpdate` 中每帧调 `setState` 或 `scheduleOnRN`）。
+   - **移动端 Web 原生体感（`mobile-native`）**：所有 `:hover` 必须包在 `@media (hover: hover) and (pointer: fine)` 中（消除触屏假悬停粘滞），输入框字号 ≥16px（防止 iOS 自动放大页面），全屏容器使用 `100dvh` 替代 `100vh`。
+2. **四步递进验证**：
    - **Step 1（无头状态机 / TLA+）**：将重连、选中态同步、审批流从 UI 剥离，先用无头脚本随机跑几百次乱序操作序列（或 TLA+ 模型检验），验证无死锁。
-   - **Step 2（结构树与几何测量）**：
+   - **Step 2（`break-ui` 极限脏数据压测）**：向组件注入真实世界最坏情况夹具（30 字符无空格德语复合词、65 字符长邮箱、单字母短名、`0 / 1 / 1,000+` 条集合、动态跳变数字 `tabular-nums`），提前暴露 Flex 挤压（缺 `min-width: 0` / `flex-shrink: 0`）与爆框。
+   - **Step 3（结构树与几何测量）**：
      - Android：通过 `adb exec-out uiautomator dump /dev/tty` 解析节点 `bounds=[x1,y1][x2,y2]`，断言控件对齐、无越界裁切、软键盘弹出后输入框仍在可见区域内（避免 Android `adjustResize` 与内层 `KeyboardInset` 双倍叠加）。
      - Web：通过 DOM `getBoundingClientRect()` 与 `scrollWidth > clientWidth` 检查横向溢出与文本截断。
-   - **Step 3（静止态截图比对）**：在动画静止后截取明/暗主题画面，做最终视觉验收。
+   - **Step 4（静止态截图比对）**：在动画静止后截取明/暗主题画面，做最终视觉验收。
 
 ---
 
