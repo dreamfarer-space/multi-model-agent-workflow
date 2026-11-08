@@ -1,0 +1,139 @@
+# =============================================================================
+# Hermes Agent × Magpie Multi-Model Workflow Configuration (Sanitized Example)
+# =============================================================================
+# Apply individual settings with `hermes config set <key> <value>` rather than
+# hand-editing a live config.yaml.
+
+model:
+  default: antigravity/gemini-4-argon
+  provider: magpie
+  key_env: HERMES_CUSTOM_MAGPIE_API_KEY
+  base_url: http://127.0.0.1:3425/v1
+  api_mode: chat_completions
+
+agent:
+  max_turns: 500
+  reasoning_effort: "high"
+  service_tier: "normal"
+
+# -----------------------------------------------------------------------------
+# Subagent Delegation: 3-Family Fast Rotation Pool + Zero-Cost Fallback
+# -----------------------------------------------------------------------------
+delegation:
+  model: group/work
+  provider: magpie
+  reasoning_effort: high
+  max_iterations: 250
+  max_concurrent_children: 10
+  worktree_isolation: true
+  fallback_providers:
+    - provider: magpie
+      model: workbuddy/deepseek-v4.1-flash
+      base_url: http://127.0.0.1:3425/v1
+    - provider: magpie
+      model: minimax-code/MiniMax-M3.1-Flash
+      base_url: http://127.0.0.1:3425/v1
+    - provider: magpie
+      model: workbuddy/hy4free
+      base_url: http://127.0.0.1:3425/v1
+
+# -----------------------------------------------------------------------------
+# Loop Guardrails: Stop stuck subagents without cutting legitimate long tasks
+# -----------------------------------------------------------------------------
+tool_loop_guardrails:
+  warnings_enabled: true
+  hard_stop_enabled: false
+  non_interactive_hard_stop_enabled: true
+  warn_after:
+    exact_failure: 2
+    same_tool_failure: 3
+    idempotent_no_progress: 2
+  hard_stop_after:
+    exact_failure: 5
+    same_tool_failure: 8
+    idempotent_no_progress: 5
+
+# -----------------------------------------------------------------------------
+# Auxiliary Consumers: Quota-Isolated Compression, Vision, Title & Review
+# -----------------------------------------------------------------------------
+auxiliary:
+  review:
+    provider: magpie
+    model: codex/gpt-6.1-sol
+    base_url: http://127.0.0.1:3425/v1
+  background_review:
+    enabled: true
+    provider: magpie
+    model: codex/gpt-6.1-sol
+    reasoning_effort: high
+    base_url: http://127.0.0.1:3425/v1
+  compression:
+    provider: magpie
+    model: minimax-code/MiniMax-M3.1-Flash
+    base_url: http://127.0.0.1:3425/v1
+  vision:
+    provider: magpie
+    model: antigravity/gemini-3.8-flash
+    base_url: http://127.0.0.1:3425/v1
+  title_generation:
+    enabled: true
+    provider: magpie
+    model: antigravity/gemini-3.8-flash
+    base_url: http://127.0.0.1:3425/v1
+
+# -----------------------------------------------------------------------------
+# Quick-Switch Model Aliases (`/model <alias>`)
+# -----------------------------------------------------------------------------
+model_aliases:
+  argon:
+    model: antigravity/gemini-4-argon
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  gemini:
+    model: antigravity/gemini-3.8-flash
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  deepseek:
+    model: workbuddy/deepseek-v4.1-flash
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  minimax:
+    model: minimax-code/MiniMax-M3.1-Flash
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  kimi:
+    model: workbuddy/kimi-k3.1-pro
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  hy4:
+    model: workbuddy/hy4free
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  sol:
+    model: codex/gpt-6.1-sol
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  opus:
+    model: antigravity/claude-opus-5-5
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  sonnet:
+    model: antigravity/claude-sonnet-5-5
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  work:
+    model: group/work
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  edit:
+    model: group/edit
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  review:
+    model: group/review
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  duty:
+    model: group/duty
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
