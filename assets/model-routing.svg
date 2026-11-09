@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" role="img" aria-labelledby="routing-title routing-desc">
+  <title id="routing-title">Multi-Model Routing and Quota Isolation Architecture</title>
+  <desc id="routing-desc">Lead architect Gemini 4 Argon dispatches read-only recon to a 3-family rotation pool, delegates locale sync to Gemini 3.8 Flash and context compression to MiniMax M3.1 Flash, and sends final diffs to GPT-6.1-Sol for blind review.</desc>
+  <style>
+    .bg { fill: #f8fafc; }
+    .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; rx: 8; }
+    .card-lead { fill: #eff6ff; stroke: #2563eb; stroke-width: 2; rx: 8; }
+    .card-pool { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.75; rx: 8; }
+    .card-review { fill: #fffbeb; stroke: #d97706; stroke-width: 1.75; rx: 8; }
+    .pill { fill: #e2e8f0; rx: 4; }
+    .pill-blue { fill: #dbeafe; rx: 4; }
+    .pill-green { fill: #dcfce7; rx: 4; }
+    .pill-amber { fill: #fef3c7; rx: 4; }
+    .h1 { font: 700 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; fill: #0f172a; }
+    .h2 { font: 700 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; fill: #0f172a; }
+    .mono { font: 600 12px "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; fill: #1e293b; }
+    .body { font: 400 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; fill: #334155; }
+    .muted { font: 500 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; fill: #64748b; }
+    .line { stroke: #64748b; stroke-width: 1.75; fill: none; }
+    .line-dashed { stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 5,4; fill: none; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="960" height="520" rx="12"/>
+  <text x="32" y="36" class="h1">Quota-Isolated Multi-Model Routing (Hermes Agent × Magpie Gateway)</text>
+  <text x="32" y="56" class="muted">Each role is pinned to an independent provider quota pool so background work never drains frontier capacity.</text>
+
+  <!-- Lead Architect -->
+  <rect x="280" y="76" width="400" height="108" class="card-lead"/>
+  <rect x="296" y="90" width="150" height="22" class="pill-blue"/>
+  <text x="304" y="105" class="mono">1. Lead Architect</text>
+  <text x="458" y="105" class="mono">antigravity/gemini-4-argon</text>
+  <text x="296" y="130" class="body">• Pre-code decision grilling (grill-me) and coupled multi-file edits</text>
+  <text x="296" y="148" class="body">• Visual screenshot sign-off (Roboflow 87.5%) and math derivations</text>
+  <text x="296" y="168" class="muted">Pool: Google AI Ultra (resets every 5h) | DeepSWE v1.1: 77.9% | GraphWalks: 99.7%</text>
+
+  <!-- Connector lines from Lead to 3 middle boxes -->
+  <path d="M 480 184 L 480 208 L 175 208 L 175 232" class="line" marker-end="url(#arrow)"/>
+  <path d="M 480 184 L 480 232" class="line" marker-end="url(#arrow)"/>
+  <path d="M 480 184 L 480 208 L 785 208 L 785 232" class="line" marker-end="url(#arrow)"/>
+
+  <!-- Left: 3-Family Subagent Swarm -->
+  <rect x="32" y="236" width="286" height="148" class="card-pool"/>
+  <rect x="48" y="250" width="254" height="22" class="pill-green"/>
+  <text x="56" y="265" class="mono">2. Subagent Swarm: group/work</text>
+  <text x="48" y="288" class="body">• DeepSeek-V4.1-Flash (190 tok/s, TB 90.6%)</text>
+  <text x="48" y="306" class="body">• MiniMax-M3.1-Flash (166 tok/s, 256K #1)</text>
+  <text x="48" y="324" class="body">• Gemini-3.8-Flash (130 tok/s, LCB 89.5%)</text>
+  <text x="48" y="344" class="muted">Mode: rotate/turn (sticky tool calls per child)</text>
+  <text x="48" y="362" class="muted">Return cap: ≤50 lines with exact file:line</text>
+
+  <!-- Center: Multi-Locale & Prose -->
+  <rect x="337" y="236" width="286" height="148" class="card"/>
+  <rect x="353" y="250" width="254" height="22" class="pill"/>
+  <text x="361" y="265" class="mono">3. Locale &amp; Prose: group/edit</text>
+  <text x="353" y="288" class="body">• Primary: antigravity/gemini-3.8-flash</text>
+  <text x="353" y="308" class="body">• Single-pass sync across all locale files</text>
+  <text x="353" y="326" class="body">• PR descriptions &amp; routine vision triage</text>
+  <text x="353" y="352" class="muted">Pool: Google AI Pro accounts only</text>
+  <text x="353" y="368" class="muted">(0% impact on Ultra Argon quota)</text>
+
+  <!-- Right: Context Compression -->
+  <rect x="642" y="236" width="286" height="148" class="card"/>
+  <rect x="658" y="250" width="254" height="22" class="pill"/>
+  <text x="666" y="265" class="mono">4. Compression: MiniMax-M3.1</text>
+  <text x="658" y="288" class="body">• Model: minimax-code/MiniMax-M3.1-Flash</text>
+  <text x="658" y="308" class="body">• LOCA-Bench 256K: 60.3% (#1 retrieval)</text>
+  <text x="658" y="326" class="body">• 1M input window / 524K max output</text>
+  <text x="658" y="352" class="muted">Preserves file:line &amp; falsified hypotheses</text>
+  <text x="658" y="368" class="muted">during long-session compaction</text>
+
+  <!-- Connector to Bottom Review Bar -->
+  <path d="M 175 384 L 175 404 L 480 404 L 480 416" class="line" marker-end="url(#arrow)"/>
+  <path d="M 480 384 L 480 416" class="line" marker-end="url(#arrow)"/>
+
+  <!-- Bottom: Blind Review & Surgical Escalation -->
+  <rect x="32" y="420" width="896" height="76" class="card-review"/>
+  <rect x="48" y="434" width="288" height="22" class="pill-amber"/>
+  <text x="56" y="449" class="mono">5. Blind Review &amp; Escalation Gate</text>
+  <text x="352" y="449" class="mono">codex/gpt-6.1-sol (high)  +  claude-opus-5-5 (surgical only)</text>
+  <text x="48" y="474" class="body">• GPT-6.1-Sol inspects only Brief + git diff + test output: Stage 1 Spec Compliance (Missing / Extra / Misunderstood) → Stage 2 Concurrency &amp; Quality</text>
+  <text x="48" y="490" class="muted">• Two-Strike Rule: If 2 fix attempts fail, stop stacking patches and escalate the isolated diff to Claude Opus 5.5 (SWE-bench Pro 89.9%) for 1 turn.</text>
+</svg>

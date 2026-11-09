@@ -2,57 +2,35 @@
 
 **English** | [简体中文](./README.md)
 
-A production-grade, multi-model AI software engineering workflow designed for **Hermes Agent**, **Magpie Gateway**, **Claude Code**, and **Codex**.
+This repository contains the model routing setup, guardrail rules, and 20 bundled agent skills I use for full-stack TypeScript, React Native (Expo), iOS (Swift), and embedded C++ work.
 
-This workflow solves two practical problems:
-1. **Quota-Aware Model Right-Sizing**: Pair each model's verified 2026 benchmark strengths with its subscription quota mechanics—using a 5-hour-resetting frontier pool (`Gemini 4 Argon`) as the Lead Architect, a 3-family high-throughput rotation pool (`DeepSeek-V4.1-Flash` + `MiniMax-M3.1-Flash` + `Gemini-3.8-Flash`) for parallel subagents, a cross-family reasoning model (`GPT-6.1-Sol`) for blind code review, and `MiniMax-M3.1-Flash` for long-context compression.
-2. **Deterministic Engineering Guardrails**: Distill battle-tested practices from Boris Cherny (Claude Code), Jesse Vincent (`obra/superpowers`), Garry Tan (`garrytan/gstack`), Matt Pocock (`grill-me`), Andrej Karpathy (`LLM Council` / `LLM Wiki`), and AI-native engineering (`Lint-as-Memory`, headless state simulation, UI geometry verification) into enforceable rules.
+It grew out of two failures I hit repeatedly:
+1. **Wasting frontier quota on file-grepping chores.** Letting a slow, expensive reasoning model spend 30 turns scanning a repo burns through a 5-hour quota window in an afternoon, while routing every subagent to a single free tier causes rate-limit stalls.
+2. **Multi-agent write collisions.** I once spawned 7 concurrent subagents to fix a mobile chat UI and its 7 locale files at the same time. They stepped on each other's props and state assumptions so badly that I had to revert the entire branch.
 
----
+The fix is simple: keep one high-context architect model in the main window for design decisions and coupled edits, fan out read-only reconnaissance across three fast model families on separate provider pools, and use a different model family to blind-review the final `git diff`.
 
-## 1. The 5-Role Model Team
-
-See [`docs/benchmarks-2026-11.md`](./docs/benchmarks-2026-11.md) for the full benchmark breakdown.
-
-| Role | Model / Route | Verified Benchmark Strength | Quota & Engineering Rationale |
-| :--- | :--- | :--- | :--- |
-| **1. Lead Architect (Main Session)** | `antigravity/gemini-4-argon`<br>(`model.default`) | • **DeepSWE v1.1: 77.9%** (beats Opus 5.5 74.2% & Sol 75.2%)<br>• **GraphWalks 128K: 99.7%** (#1 multi-file call-graph recall)<br>• **Roboflow Vision: 87.5%** (#1 vision & OCR)<br>• **LMArena Text 1530 / Math 1542 #1** | Excels at architecture, tightly coupled multi-file edits, React UI (1702 Elo), visual screenshot inspection, and math/control-theory derivations. Because its TTFT is 15–20s, offload broad file scanning to subagents so the main session stays fast and clean. Runs on an isolated Google AI Ultra pool (resets every 5h). |
-| **2. Parallel Subagent Swarm** | `group/work`<br>(`routing=rotate, stays=turn`) | • **DeepSeek-V4.1-Flash**: DeepSWE **77.0%**, Terminal-Bench 2.1 **90.6%** (~190 tok/s)<br>• **MiniMax-M3.1-Flash**: LOCA-Bench 256K **60.3% #1**, Automation-Bench **62.8% #1** (~166 tok/s)<br>• **Gemini-3.8-Flash**: LiveCodeBench **89.5%** (~130 tok/s) | Rotating across three distinct providers and model families avoids single-account rate limits, finishes 4-way parallel reconnaissance in ~3 minutes, and combines complementary blind spots. `stays=turn` keeps all tool calls within a subagent turn sticky to the model it started on. Zero-cost `workbuddy/hy4free` sits in `fallback_providers`. |
-| **3. Localization & Prose Specialist** | `antigravity/gemini-3.8-flash`<br>(`group/edit`) | • **LMArena Vision (Chinese/Diagrams): #1**<br>• **130 tok/s + strong multilingual fluency** | Pinned to Google AI Pro accounts via Magpie `accountModels`, consuming **0%** of the Ultra account's Argon quota. Handles single-pass multi-locale synchronization (`locales/*.ts`), PR descriptions, and routine vision checks. |
-| **4. Context Compression Specialist** | `minimax-code/MiniMax-M3.1-Flash`<br>(`auxiliary.compression`) | • **LOCA-Bench 256K: 60.3% (#1 worldwide)**<br>• **1M context / 524K max output** | Preserves exact `file:line` anchors and falsified hypotheses during long-session compaction without touching frontier quotas. |
-| **5. Cross-Family Blind Reviewer & Escalation** | `codex/gpt-6.1-sol:high`<br>(`auxiliary.review`)<br>Escalation: `claude-opus-5-5` | • **GPT-6.1-Sol**: DeepSWE **75.2%**, MultiChallenge **82.0% #1**<br>• **Claude Opus 5.5**: SWE-bench Pro **89.9% #1**, Terminal-Bench 4.0 **66.4% #1** | `GPT-6.1-Sol` performs 2-stage blind review on the final `git diff`. Scarce `Opus 5.5` quota is reserved strictly for single-turn surgical escalation when a bug survives two fix attempts. |
+![Multi-Model Routing and Quota Isolation Architecture](./assets/model-routing.svg)
 
 ---
 
-## 2. The 5-Stage Engineering Pipeline
+## Quick start (works out of the box)
 
-1. **Stage 1 — Parallel Recon & Pre-Code Hard Gate (`<HARD-GATE>`)**:
-   - Dispatch 3–5 `group/work` subagents to map call chains and return concise summaries (**≤50 lines with `file:line`**, never raw file dumps).
-   - Use `grill-me` to resolve open design branches with recommended options (never ask the user for facts discoverable in the repo) and lock `Out of Scope` files before editing.
-2. **Stage 2 — Focused Execution & Two-Strike Reset**:
-   - Keep tightly coupled UI/store edits under a single writer (`Argon` in the main session); never fragment coupled files or multi-locale updates across 5+ concurrent writers.
-   - Follow `typescript-best-practices` (discriminated unions, boundary Zod parsing, branded types, idempotent operations), `vercel-react-native-skills`, `animate-expo` (frequency gate & UI-thread worklets), `mobile-native` (`100dvh`, `@media (hover: hover)`, 16px inputs), `write-swift` (Swift 6 approachable concurrency & value types), `impeccable`, and `emil-design-eng` (semantic theme tokens only; `ease-out` <300ms; never `scale(0)`).
-   - Write `// WHY:` comments only (banning AI slop comments that restate what code does).
-   - **Two-Strike Rule**: If two consecutive fix attempts fail, stop patching in place, record the falsified hypothesis, and re-plan from root cause.
-3. **Stage 3 — 3-Layer Machine Verification**:
-   - **Layer 1**: Headless state-machine simulation / TLA+ model checking & `statechart` Mermaid compilation for concurrency, reconnection, and selection state before launching an emulator.
-   - **Layer 2**: Automated `check`, `test`, `blast-radius` 5-level evidence ladder (proving load-bearing cross-module assumptions via execution), and `benchmark-checklist` assertions.
-   - **Layer 3**: Worst-case realistic fixture stress-testing (`break-ui`) + UI hierarchy geometry checks (`uiautomator dump` `bounds` or DOM `getBoundingClientRect`) before final screenshot verification.
-4. **Stage 4 — Simplification & 2-Stage Cross-Family Blind Review**:
-   - Optional 4-agent `simplify-code` pass (`Reuse`, `Quality`, `Efficiency`, `Altitude`).
-   - `GPT-6.1-Sol (high)` reviews a self-contained brief + real `git diff` + test output: **Stage 1 checks Spec Compliance (`Missing / Extra / Misunderstood`)** first; **Stage 2 checks Code Quality & Concurrency Safety**.
-5. **Stage 5 — Compounding Engineering (`Lint-as-Memory` & `LLM Wiki`)**:
-   - Convert recurring bug patterns into deterministic static checks/lint rules so future regressions fail fast at `check` time.
-
----
-
-## 3. Quick Start
+All 20 skills are bundled directly under [`skills/`](./skills) with their scripts, reference tables, and upstream MIT / Apache-2.0 licenses ([`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md)). Clone the repo and run the installer for your agent:
 
 ```bash
-# 1. Configure Magpie routing groups (group/work, group/edit, group/review, group/duty)
+git clone https://github.com/dreamfarer-space/multi-model-agent-workflow.git
+cd multi-model-agent-workflow
+
+# 1. Install all 20 bundled skills (supports: hermes | claude | cursor | agents)
+bash scripts/install-skills.sh --target hermes
+# For Claude Code: bash scripts/install-skills.sh --target claude
+# For Cursor:      bash scripts/install-skills.sh --target cursor
+
+# 2. Configure Magpie routing groups (work / edit / review / duty)
 bash scripts/setup-magpie-groups.sh
 
-# 2. Apply Hermes settings (see configs/hermes-config.example.yaml)
+# 3. Apply Hermes model routing (see configs/hermes-config.example.yaml)
 hermes config set model.default antigravity/gemini-4-argon
 hermes config set delegation.model group/work
 hermes config set auxiliary.compression.model minimax-code/MiniMax-M3.1-Flash
@@ -61,6 +39,42 @@ hermes config set auxiliary.background_review.model codex/gpt-6.1-sol
 hermes config set auxiliary.background_review.reasoning_effort high
 ```
 
-## License
+---
 
-MIT License
+## How the 5 model roles are split
+
+Full benchmark tables (separating measured model-card scores from third-party estimates) are in [`docs/benchmarks-2026-11.md`](./docs/benchmarks-2026-11.md).
+
+| Role | Model / Route | Verified Benchmark Strength | Why it sits here |
+| :--- | :--- | :--- | :--- |
+| **1. Lead Architect** | `antigravity/gemini-4-argon`<br>(`model.default`) | DeepSWE v1.1 `77.9%`<br>GraphWalks 128K `99.7%`<br>Roboflow Vision `87.5%` | Best at cross-file call-graph recall, React UI (1702 Elo), screenshot inspection, and math/control derivations. Its first-token latency is 15–20s, so keep it off repetitive file searches. Runs on an isolated Google AI Ultra pool (resets every 5h). |
+| **2. Subagent Swarm** | `group/work`<br>(`routing=rotate, stays=turn`) | DeepSeek-V4.1-Flash (`190 tok/s`)<br>MiniMax-M3.1-Flash (`166 tok/s`)<br>Gemini-3.8-Flash (`130 tok/s`) | Rotates new subagents across three independent providers so 4-way parallel reconnaissance finishes in ~3 minutes without hitting single-account rate limits. `stays=turn` keeps all tool calls inside a subagent sticky to the model it started on. `workbuddy/hy4free` sits in `fallback_providers`. |
+| **3. Locale & Prose** | `antigravity/gemini-3.8-flash`<br>(`group/edit`) | LMArena Vision (Chinese/Diagrams) #1<br>LiveCodeBench `89.5%` | Pinned to Google AI Pro accounts in Magpie, using 0% of the Ultra account's Argon quota. Handles single-pass multi-locale sync (`locales/*.ts`) and PR descriptions. |
+| **4. Compression** | `minimax-code/MiniMax-M3.1-Flash`<br>(`auxiliary.compression`) | LOCA-Bench 256K `60.3%` (#1 retrieval)<br>524K max output | Compacts long sessions without dropping `file:line` anchors or falsified hypotheses. |
+| **5. Blind Review & Escalation** | Review: `codex/gpt-6.1-sol:high`<br>Escalation: `claude-opus-5-5` | Sol: DeepSWE `75.2%`, MultiChallenge `82.0%`<br>Opus 5.5: SWE-bench Pro `89.9%` | Sol comes from a different model family than Gemini/DeepSeek and reviews only the brief + `git diff` + test output. Scarce Opus 5.5 capacity is saved for single-turn surgical help when a bug survives two fix attempts. |
+
+---
+
+## The 5-stage workflow
+
+![Five-Stage Engineering Pipeline](./assets/pipeline.svg)
+
+Background notes and sources are in [`docs/power-user-patterns.md`](./docs/power-user-patterns.md).
+
+1. **Recon and pre-code gate (`grill-me`)**: Send 3–5 `group/work` subagents to trace the codebase and return **at most 50 lines each with `file:line`**. Resolve open design choices with recommended options and list `Out of Scope` files before writing code. Never ask the user for facts you can read from the repo.
+2. **Single-writer execution and Two-Strike Reset**: Keep tightly coupled UI, store, and navigation edits under one writer (`Argon`), and run multi-locale updates in one `Gemini 3.8 Flash` task. Model state with discriminated unions (`typescript-best-practices`), keep comments strictly to `// WHY:` guardrails, and **stop after 2 failed fix attempts** to record the falsified hypothesis rather than stacking a 3rd blind patch.
+3. **3-layer verification**:
+   - **Layer 1**: Verify concurrent/reconnection state machines with headless randomized tests or compile `.tla` specs into Mermaid statecharts via `statechart`.
+   - **Layer 2**: Run `check` and `test`, then use `blast-radius` to prove the load-bearing safety assumption with real execution (marking untested callers `UNPROVEN`). Check performance numbers against `benchmark-checklist`.
+   - **Layer 3**: Feed worst-case realistic data (`break-ui`), verify layout bounds (`uiautomator dump` or `getBoundingClientRect`), and inspect light/dark screenshots.
+4. **Cleanup and 2-stage blind review**: Run `simplify-code` if needed, then pass the self-contained brief + `git diff` + test output to `GPT-6.1-Sol (high)` to check **Stage 1: Spec Compliance (`Missing / Extra / Misunderstood`)** before **Stage 2: Concurrency & Code Quality**.
+5. **Lint-as-Memory and `LLM Wiki`**: Turn recurring bug classes into static checks so future regressions fail at `check` time, and update `index.md` in the wiki.
+
+---
+
+## Bundled skills and licenses
+
+Every bundled skill in [`skills/`](./skills) includes its upstream license file and attribution in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md):
+
+- **MIT License**: `rigorous-dev`, `grill-me` (Matt Pocock), `improve-codebase-architecture` (Matt Pocock + Lauren Tan), `typescript-best-practices` / `blast-radius` / `statechart` / `benchmark-checklist` (Lauren Tan, `cursor/plugins/pstack`), `vercel-react-native-skills` (Vercel), `animate-expo` / `break-ui` / `mobile-native` / `write-swift` / `emil-design-eng` (Emil Kowalski), `subagent-driven-development` (Jesse Vincent), `simplify-code` / `agent-merge-conflict-arbiter` / `llm-wiki` (Nous Research), `humanizer` (Siqi Chen / `@blader`).
+- **Apache License 2.0**: `impeccable` (Paul Bakaus), `frontend-design` (Anthropic).

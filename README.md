@@ -2,128 +2,35 @@
 
 [English](./README.en.md) | **简体中文**
 
-一套面向 **Hermes Agent / Claude Code / Codex** 的生产级多模型协同与防翻车软件工程工作流。
+这套配置和技能包，是我自己写全栈 TypeScript、React Native (Expo)、iOS (Swift) 和嵌入式项目时踩了一堆坑之后攒出来的。
 
-核心目标只有两个：
-1. **把每个模型的真实 Benchmark 强项与配额池特性榨干**：用每 5 小时重置的旗舰池做架构与主刀，用每日数亿免费 Token 的高吞吐多家族池跑并发子智能体，用异血统推理模型做盲审，用稀疏注意力模型做长上下文压缩。
-2. **用确定性的工程护栏消灭“多智能体乱改一气、死循环卡死、返工回滚”**：吸收 Boris Cherny、Jesse Vincent (`superpowers`)、Garry Tan (`gstack`)、Matt Pocock (`grill-me`)、Andrej Karpathy 与 AI-Native 工程实践，将软提示升级为硬门禁。
+我之前遇到过两个很蠢但很常见的问题：
+1. **模型配额乱烧，响应还慢**。把最贵的模型挂在主窗口一路 `grep` 翻文件，或者把所有子智能体都塞进同一个免费慢模型排队。结果要么半天就把稀缺额度烧光，要么 4 个子任务排在单通道里卡死。
+2. **多智能体并发改代码，改出一团乱麻**。有一次修前端交互，我一口气开了 7 个子智能体同时改相互接线的组件和 7 国语言包，两边状态对不上，最后只能整分支回滚重来。
 
----
+所以我把路由和工作流重做了一遍：**让擅长全局推理和看图的模型坐镇主窗口，让三个不同厂家的快模型轮询跑只读侦察，让异血统模型只看 `git diff` 做盲审**；同时把社区里真正管用的 20 个工程技能打包进仓库，克隆下来一行脚本就能装进 Hermes Agent、Claude Code 或 Cursor。
 
-## 一、五人模型团队编制（按 Benchmark 与配额池隔离设计）
-
-```text
-                       ┌──────────────────────────────────────────────┐
-                       │          主会话总工长 (Lead Architect)        │
-                       │         antigravity/gemini-4-argon           │
-                       │  • 需求决策树拷问 (grill-me) 与 Out-of-Scope  │
-                       │  • 核心耦合组件/状态机主刀 (禁止碎裂并发写)   │
-                       │  • 像素级 UI 截图验收 / 数学与控制理论推导     │
-                       └──────────────────────┬───────────────────────┘
-                                              │
-            ┌─────────────────────────────────┼─────────────────────────────────┐
-            ▼                                 ▼                                 ▼
-┌───────────────────────────┐   ┌───────────────────────────┐   ┌───────────────────────────┐
-│   三族并发子智能体轮询池    │   │     多语言与文案专员       │   │     长文记忆压缩专员       │
-│  group/work (rotate/turn) │   │    group/edit (order)     │   │   auxiliary.compression   │
-│ 1. DeepSeek-V4.1-Flash    │   │  Gemini-3.8-Flash (Pro池) │   │   MiniMax-M3.1-Flash      │
-│ 2. MiniMax-M3.1-Flash     │   │ • 1人全包多语言字典对齐   │   │ • LOCA-Bench 256K 榜首    │
-│ 3. Gemini-3.8-Flash       │   │ • PR 描述 / 视觉初筛      │   │ • 524K 最大输出，高保真摘要│
-│ (Fallback: Hy4 Free)      │   └───────────────────────────┘   └───────────────────────────┘
-│ • 3~5路并发只读勘察       │
-│ • 强制回传 ≤50行 file:line│
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────────────────────────────────────────────────────────┐
-│                    异血统两阶段盲审官 & 极端死锁急救                          │
-│ • 终审 (auxiliary.review): codex/gpt-6.1-sol (high) — 只读 Spec + git diff    │
-│   Stage 1: 规格合规 (Missing / Extra 私货 / Misunderstood) → Stage 2: 质量安全│
-│ • 压箱底急救 (/model opus): antigravity/claude-opus-5-5 — 仅限两轮不过单回合救场│
-└───────────────────────────────────────────────────────────────────────────────┘
-```
-
-### 为什么这么排兵布阵？（2026-11 核心基准依据）
-
-详细基准数据与来源见 [`docs/benchmarks-2026-11.md`](./docs/benchmarks-2026-11.md)。
-
-| 岗位角色 | 绑定模型 / 路由 | 核心公开 Benchmark 实绩 | 工程脾气与配额池隔离策略 |
-| :--- | :--- | :--- | :--- |
-| **1. 主窗口总工长** | `antigravity/gemini-4-argon`<br>(`model.default`) | • **DeepSWE v1.1：77.9%**（高于 Opus 5.5 的 74.2% 与 Sol 的 75.2%）<br>• **GraphWalks 128K：99.7%**（跨文件调用链记忆第 1）<br>• **Roboflow Vision：87.5%**（视觉总榜第 1，OCR 88.0%）<br>• **LMArena 总榜 1530 / 数学 1542 / 中文 1603 第 1** | **强项**：全仓库理解、React 前端（1702 Elo）、看截图查对齐、数学/控制理论推导。<br>**短板**：首字思考慢（TTFT 15~20s）、Terminal-Bench 4.0 偏弱（57.4%）。因此**不让它干零碎翻文件的跑腿活**，专心做决策与核心改码。<br>**配额**：独立绑定 Google AI Ultra 账号池（每 5 小时重置）。 |
-| **2. 并行子智能体团** | `group/work`<br>(`routing=rotate, stays=turn`) | • **DeepSeek-V4.1-Flash**：DeepSWE **77.0%**、Terminal-Bench 2.1 **90.6%**（本机 190 tok/s，TTFT 4s）<br>• **MiniMax-M3.1-Flash**：LOCA-Bench 256K **60.3%**、Automation-Bench **62.8%**（166 tok/s）<br>• **Gemini-3.8-Flash**：LiveCodeBench **89.5%**、Terminal-Bench 2.1 **89.4%**（130 tok/s） | **三族轮询优势**：4 个并发子智能体同时走腾讯 WorkBuddy、MiniMax、Google Pro 三条独立通道，**不撞单账号并发限流**；且三家模型盲区互补（DeepSeek 抓逻辑、MiniMax 扫大文件、Gemini 查 UI 与多语言）。<br>**粘性保证**：`stays=turn` 确保每个子智能体内部的多轮工具调用固定在同一模型上，不串台。<br>**兜底**：0 积分消耗的 `workbuddy/hy4free`（DeepSWE 74.9%）放在 `fallback_providers`。 |
-| **3. 多语言与文案官** | `antigravity/gemini-3.8-flash`<br>(`group/edit`) | • **LMArena Vision (Chinese/Diagrams)：第 1**<br>• **130 tok/s 高吞吐 + 原生多语种地道表达** | **配额隔离**：在 Magpie 的 `accountModels` 中将 `gemini-3.8-flash` 限制在 Google AI Pro 账号池运行，**0% 消耗 Ultra 账号的 Argon 额度**。专职单任务一次性对齐多国语言包（`locales/*.ts`）、写 PR 描述与定时任务。 |
-| **4. 长文压缩官** | `minimax-code/MiniMax-M3.1-Flash`<br>(`auxiliary.compression`) | • **LOCA-Bench 256K 长程检索：60.3%（第 1，领先 Kimi K3 / GLM-5.3 约 10 分）**<br>• **1M 输入窗口 / 524K 最大输出** | 会话触发上下文压缩时，由它生成结构化摘要，最不容易丢失关键 `file:line` 与已证伪假设。 |
-| **5. 独立盲审官** | `codex/gpt-6.1-sol:high`<br>(`auxiliary.review`) | • **DeepSWE v1.1：75.2%**（成本仅为 Astra 的 1/5）<br>• **MultiChallenge 多轮指令遵循：82.0%（第 1）**<br>• **FrontierMath Tier 4：100%** | 与写代码的 Gemini / DeepSeek 属于**不同模型血统**。只看冷冰冰的 `git diff` 与测试输出，专抓并发竞态、未释放锁与越界修改。 |
-| **6. 压箱底重锤** | `antigravity/claude-opus-5-5`<br>(`/model opus`)<br>平替：`workbuddy/kimi-k3.1-pro` | • **Opus 5.5**：SWE-bench Pro **89.9%（第 1）**、Terminal-Bench 4.0 **66.4%（第 1）**、CodeRabbit 并发 Bug 捕获 **76.9%**<br>• **Kimi K3.1 Pro**：Terminal-Bench 4.0 **65.7%（国产第 1）** | `Opus 5.5` 额度稀缺，**严禁挂在主会话跑长工具链**。仅当主脑连修 2 轮未过时，喂入已定位的 2 个核心文件做 **1 回合单刀手术**，改完立即切回。日常中等难度前端可由 `kimi-k3.1-pro` 顶替。 |
+![多模型路由与配额隔离架构](./assets/model-routing.svg)
 
 ---
 
-## 二、五步防翻车工程流水线（Standard Operating Pipeline）
+## 一分钟装好（开箱即用）
 
-完整方法论来源见 [`docs/power-user-patterns.md`](./docs/power-user-patterns.md)，可执行技能文件见 [`skills/rigorous-dev/SKILL.md`](./skills/rigorous-dev/SKILL.md)。
-
-### 第 1 步：侦察 + 立规矩（写码前硬门禁 `<HARD-GATE>`）
-1. **子智能体探路，主线保持干净**：
-   - 主窗口 `Argon` 不自己一轮轮零碎翻文件（避免每轮 15~20s 首字延迟累加，也避免几万行源码塞满主窗口）。
-   - 直接派 3~5 个 `group/work` 子智能体并行只读勘察，**强制每个子智能体只回传 ≤50 行的浓缩结论 + 精确 `file:line`**。
-2. **`grill-me` 决策树拷问**：
-   - 查证事实是 Agent 的工作（**严禁向用户提问读源码能查清的事实**）；权衡取舍是用户的工作。
-   - 复杂或存在分支的需求，先按前沿轮次（Frontier Rounds）向用户提出 2~3 道带推荐选项的选择题，清空未知分支前严禁写业务代码。
-3. **锁死 `Out of Scope` 与容量预算**：
-   - 明确声明本次允许修改的文件白名单、禁止触碰的模块，以及包体积/内存/行数硬上限。
-
-### 第 2 步：集中操刀写代码（防乱改、防死循环）
-1. **耦合代码 1 人主刀，严禁碎裂并发写**：
-   - 相互接线的 UI 组件、Store 状态同步、路由导航，**必须由主窗口 `Argon` 自己一刀改完**（完全独立的模块最多派 1~2 个带 `worktree_isolation: true` 的子智能体）。
-   - 多国语言字典（如 7 个 `locales/*.ts`）由 `Argon` 改好主语言后，**只派 1 个 `Gemini 3.8 Flash` 子智能体一次性同步其余语言**，严禁拆成多个并发写任务。
-2. **设计 Token 铁律、TS 类型防呆、动效频率门禁与 `// WHY:` 注释规范**：
-   - **TypeScript 严格建模（`typescript-best-practices`）**：用可辨识联合（Discriminated Unions）代替散落的布尔值消除非法状态组合；边界一次性解析（`z.infer<typeof Schema>`）；ID 使用 Branded Types 守卫而非 `as` 强转；迁移/刷新/重试操作必须**幂等（读当前状态只补差额）**。
-   - 前端/移动端严格遵循 `vercel-react-native-skills`、`animate-expo`、`mobile-native`、`write-swift`（iOS Swift 6 并发与值类型）以及 `impeccable` / `emil-design-eng`：只准引用 `theme.ts` / `DESIGN.md` 中的语义 Token，禁止手写 `#hex` 颜色与魔法数字；**高频动作（100+ 次/天，如切 Tab、开关键盘、快捷键面板）一律 `animation: 'none'`**，动效只走 GPU `transform`/`opacity`（<300ms `ease-out`，严禁 `scale(0)`）。
-   - **禁止写复述代码表面意思的废话注释**（如 `// 更新状态`）；**强制保留解释平台特殊坑或协议边界的 `// WHY:` 护栏注释**（防止后续智能体误删保命逻辑）。
-3. **两轮不过立即掀桌（Two-Strike Reset Rule）**：
-   - 同一个 Bug 如果连续修改 **2 轮** 仍未通过测试，**立即停止原地叠第 3 层补丁**！
-   - 记录“已证伪的假设（哪条路走不通）”，回到根因重新规划，或单回合调用 `Opus 5.5` 救场。
-
-### 第 3 步：三层机器自检闭环（不靠肉眼猜）
-1. **第 1 层：无头状态机乱序模拟 / TLA+ `statechart` 验算（先于模拟器）**
-   - 涉及断线重连、选中态回写、轮询竞态、权限审批，先将状态转换抽离为纯逻辑，跑无头随机序列测试，或使用 `pstack/statechart` 将 `.tla` 规范编译为 Mermaid 状态图（`chart.mmd`）与最短反例路径，1 秒内验证状态不变量。
-2. **第 2 层：构建、类型、目标回归与 `blast-radius` 5 级证据链**
-   - 运行目标包的 `check`、`test` 与构建产物校验脚本，必须取得真实 Exit Code 0 输出；
-   - **爆破半径核查（`blast-radius`）**：找出“本次跨模块改动之所以安全，唯一依赖的那个前提假设”，并用第 4/5 级真实运行证据证明它（未跑过的调用方必须显式标注 `UNPROVEN`）；性能数据汇报必须过 `benchmark-checklist` 7 问门禁。
-3. **第 3 层：`break-ui` 极限脏数据压测 + UI 几何结构树算坐标 → 最终截图**
-   - **先喂最坏真实数据（`break-ui`）**：用 30 字符德语复合词、65 字符无空格长邮箱、单字母短名、`0 / 1 / 1,000+` 条列表数据压测组件，排查 `min-width: 0` 缺失、头像挤压与多语言爆框；
-   - **结构树 = 事实，几何 = 度量，截图 = 证据**：再通过 Android `uiautomator dump` 检查控件 `bounds=[x1,y1][x2,y2]`（或 Web DOM `getBoundingClientRect`），确认无横向溢出、无文字截断、软键盘弹出后输入框仍在可见区域内；
-   - 几何校验通过后，再截出明/暗主题画面由 `Argon` 视觉把关（严禁在截图中暴露个人用户名或本地私密路径）。
-
-### 第 4 步：代码瘦身 + 异血统两阶段盲审
-1. **四路并发清理（`simplify-code`）**：
-   - 针对本次 diff 并发检查：复用现有工具函数（Reuse）、消除冗余状态（Quality）、修复性能/未清理句柄（Efficiency）、拒绝浅层创可贴补丁（Altitude）。
-2. **`GPT-6.1-Sol (high)` 两阶段交叉盲审**：
-   - 只向审查者提供**自包含任务单 + 真实 `git diff` + 测试命令输出**（不传聊天记录，不信开发者自评）：
-     - **Stage 1（规格合规优先）**：查 `Missing`（漏做）、`Extra`（计划外顺手乱改的私货）、`Misunderstood`。存在 `Extra` 私货直接打回，不进入下一关。
-     - **Stage 2（代码质量与并发安全）**：查竞态条件、连接代次泄漏、边界容错。
-
-### 第 5 步：「Lint 即记忆」复利收尾（Lint-as-Memory）
-1. **把典型 Bug 转化为静态检查规则**：
-   - 写进文档的规矩模型会忘，写进 `check` 脚本的规矩模型不敢犯。每修完一类典型缺陷（如双层 `KeyboardInset` 嵌套、语言包 key 不对齐、客户端包混入服务端依赖），顺手在静态检查或单测里加一条拦截规则。
-2. **知识沉淀（`llm-wiki`）**：
-   - 将架构决策、协议边界与理论推导按 `raw/`（只读源）+ `concepts/` + `index.md` 归档，新会话只需读 1 页 `index.md` 即可接上完整上下文。
-
----
-
-## 三、快速落地配置
-
-### 1. 一键配置 Magpie 路由组
-运行 [`scripts/setup-magpie-groups.sh`](./scripts/setup-magpie-groups.sh)，自动创建并验证 `group/work`（三族 `rotate/turn`）、`group/edit`、`group/review` 与 `group/duty`：
+仓库的 `skills/` 目录已经内置了整理、去重并通过安全检查的 **20 个开源技能**（全部保留上游 MIT / Apache-2.0 版权声明，见 [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md)）。不需要挨个联网拉取，克隆仓库后直接跑安装脚本就行：
 
 ```bash
+git clone https://github.com/dreamfarer-space/multi-model-agent-workflow.git
+cd multi-model-agent-workflow
+
+# 1. 一键安装全部 20 个技能（支持 hermes / claude / cursor / agents 四种目标目录）
+bash scripts/install-skills.sh --target hermes
+# 如果你用 Claude Code: bash scripts/install-skills.sh --target claude
+# 如果你用 Cursor:      bash scripts/install-skills.sh --target cursor
+
+# 2. 如果你用 Magpie 网关管理多账号，一键建好 4 个路由组
 bash scripts/setup-magpie-groups.sh
-```
 
-### 2. 对齐 Hermes 配置
-参考 [`configs/hermes-config.example.yaml`](./configs/hermes-config.example.yaml)，使用 `hermes config set` 更新对应键值（切勿手改正在运行的 `config.yaml` 缩进）：
-
-```bash
+# 3. 在 Hermes 中绑定对应角色（参考 configs/hermes-config.example.yaml）
 hermes config set model.default antigravity/gemini-4-argon
 hermes config set delegation.model group/work
 hermes config set auxiliary.compression.model minimax-code/MiniMax-M3.1-Flash
@@ -132,51 +39,110 @@ hermes config set auxiliary.background_review.model codex/gpt-6.1-sol
 hermes config set auxiliary.background_review.reasoning_effort high
 ```
 
-### 3. 配套核心技能清单
-将 [`skills/rigorous-dev/SKILL.md`](./skills/rigorous-dev/SKILL.md) 放入 `$HERMES_HOME/skills/software-development/rigorous-dev/SKILL.md`，并推荐搭配以下开源技能：
+---
 
-```bash
-# Hermes 内置可选技能启用
-hermes skills repair-official --restore -y grill-me
-hermes skills repair-official --restore -y agent-merge-conflict-arbiter
-hermes skills repair-official --restore -y subagent-driven-development
+## 五个岗位怎么分工
 
-# 社区顶流技能安装 (Vercel / Matt Pocock / Emil Kowalski / Cursor pstack / Anthropic)
-hermes skills install -y --category software-development vercel-labs/agent-skills/skills/react-native-skills
-hermes skills install -y --category software-development mattpocock/skills/skills/engineering/improve-codebase-architecture
-hermes skills install -y --category software-development cursor/plugins/pstack/skills/typescript-best-practices
-hermes skills install -y --category software-development cursor/plugins/pstack/skills/blast-radius
-hermes skills install -y --category software-development cursor/plugins/pstack/skills/benchmark-checklist
-hermes skills install -y --category software-development cursor/plugins/pstack/skills/statechart
-hermes skills install -y --category software-development emilkowalski/skills/skills/animate-expo
-hermes skills install -y --category software-development emilkowalski/skills/skills/mobile-native
-hermes skills install -y --category software-development emilkowalski/skills/skills/write-swift
-hermes skills install -y --category creative emilkowalski/skills/skills/emil-design-eng
-hermes skills install -y --category creative pbakaus/impeccable/.hermes/skills/impeccable
-hermes skills install -y --category creative anthropics/skills/skills/frontend-design
-```
+各模型的详细公开测试数据（区分官方实测与第三方推算值）整理在 [`docs/benchmarks-2026-11.md`](./docs/benchmarks-2026-11.md)。实际用下来，每个模型的脾气差得很远：
+
+| 岗位 | 绑定模型 / 路由 | 核心公开基准 | 为什么放这个位置 |
+| :--- | :--- | :--- | :--- |
+| **1. 主窗口总工长** | `antigravity/gemini-4-argon`<br>(`model.default`) | DeepSWE v1.1 `77.9%`<br>GraphWalks 128K `99.7%`<br>Roboflow 视觉 `87.5%` | 跨文件调用链记忆和看图查 UI 对齐最准，数学与控制理论推导也稳。缺点是首字思考要 15–20 秒，所以别让它干翻文件、跑腿查日志的活，只让它拍板方案和集中改耦合代码。走 Google AI Ultra 池（每 5 小时重置）。 |
+| **2. 并行子智能体** | `group/work`<br>(`routing=rotate, stays=turn`) | DeepSeek-V4.1-Flash (`190 tok/s`)<br>MiniMax-M3.1-Flash (`166 tok/s`)<br>Gemini-3.8-Flash (`130 tok/s`) | 派 3–5 个子任务出去时，按轮询分发到腾讯 WorkBuddy、MiniMax 和 Google Pro 三条独立通道，不撞单账号并发墙。`stays=turn` 保证同一个子智能体在多轮工具调用中途不会换模型。`workbuddy/hy4free` 放在 `fallback_providers` 兜底。 |
+| **3. 多语言与文案** | `antigravity/gemini-3.8-flash`<br>(`group/edit`) | LMArena 中文视觉第 1<br>LiveCodeBench `89.5%` | 在 Magpie 里把这个模型锁死在 Google AI Pro 账号池，完全不占 Ultra 池的 Argon 额度。专门负责单任务一次性同步多国语言字典（`locales/*.ts`）和写 PR 说明。 |
+| **4. 上下文压缩** | `minimax-code/MiniMax-M3.1-Flash`<br>(`auxiliary.compression`) | LOCA-Bench 256K `60.3%`（长程检索第 1）<br>最大输出 `524K` | 长会话触发自动压缩时由它接手，最不容易把前面查出来的 `file:line` 和已经证伪的死胡同弄丢。 |
+| **5. 盲审与急救** | 盲审：`codex/gpt-6.1-sol:high`<br>急救：`claude-opus-5-5` | Sol：DeepSWE `75.2%`、指令遵循 `82.0%`<br>Opus 5.5：SWE-bench Pro `89.9%` | 写代码用 Gemini/DeepSeek，审代码换 OpenAI 血统的 Sol，只看需求单、`git diff` 和测试输出。Opus 5.5 额度少，严禁挂在主窗口跑长链路，只在主模型连改两轮还不过时切过去做单回合手术。 |
 
 ---
 
-## 四、仓库结构
+## 日常干活的五步流程
+
+![五步工程流水线](./assets/pipeline.svg)
+
+这套流程吸收了 Boris Cherny、Jesse Vincent (`superpowers`)、Garry Tan (`gstack`)、Matt Pocock (`grill-me`)、Emil Kowalski 以及 Lauren Tan (`cursor/pstack`) 的做法，背景拆解见 [`docs/power-user-patterns.md`](./docs/power-user-patterns.md)。
+
+### 1. 先探路、问清楚边界，再动手写码
+- 主窗口不自己翻大仓库，直接派 3–5 个 `group/work` 子智能体只读勘察，要求每个子任务只回传 **50 行以内的结论 + 精确 `file:line`**，别把几千行原始代码塞进主窗口。
+- 凡是有设计分支的地方，先用 `grill-me` 提 2–3 道带推荐项的选择题把分支定死，顺手列明 `Out of Scope`（这次绝不碰哪些文件）。源码里能查到的事实自己查，不问用户。
+
+### 2. 耦合代码一个人改，连错两轮立刻停手
+- 相互接线的 UI 组件、Store 状态和路由导航，由主窗口 `Argon` 一个人从头改到尾。多国语言包改完中文主文件后，只派 1 个 `Gemini 3.8 Flash` 子智能体一次性对齐其余语言，绝不拆成七八个并发写任务。
+- 写 TypeScript 按 `typescript-best-practices` 走：用可辨识联合（Discriminated Unions）代替散落的布尔变量，在边界做一次 Zod 解析（`z.infer`），状态迁移和重试必须幂等（先读当前状态，只补差额）。
+- 写注释只写 `// WHY:`（解释平台特殊坑或协议不变量，防止后面的模型手欠删掉保命逻辑），不写复述代码表面意思的废话注释。
+- **两轮重置规则（Two-Strike Reset）**：同一个问题如果连续改了两轮还没过测试，立刻停手，不准叠第三层补丁。先把“哪条假设走不通”记下来，退回根因重想，或者切 `/model opus` 看一眼核心文件。
+
+### 3. 三层机器验证（别靠肉眼猜）
+1. **先跑无头状态机或 TLA+ `statechart`**：遇到断线重连、选中态回写、轮询竞态、审批流，先把状态机抽出来跑随机乱序测试；或者用内置的 `statechart` 技能调用 TLC，把 `.tla` 规范直接编译成 Mermaid 状态图（`chart.mmd`）和最短反例路径。
+2. **再跑构建、测试与 `blast-radius` 证据梯**：跑通目标包的 `check` 和 `test` 后，用 `blast-radius` 找出“这次跨模块改动之所以安全，唯一依赖的那一个前提事实”，写个小脚本或单测跑一下真实代码证明它；没跑过的调用方老老实实标 `UNPROVEN`。如果汇报性能提升，先过一遍 `benchmark-checklist` 的 7 个问题。
+3. **最后喂脏数据、算几何坐标、看截图**：先用 `break-ui` 里的极限真实数据（30 字符无空格德语长词、65 字符长邮箱、单字母短名、`0 / 1 / 1000` 行列表）测一遍会不会爆框；再用 Android `uiautomator dump` 的 `bounds` 或浏览器 `getBoundingClientRect` 核对坐标，最后截明/暗主题图给 `Argon` 检查（截图里严禁露出个人用户名或本地路径）。
+
+### 4. 代码瘦身 + 异血统两阶段盲审
+- 改动较大时先跑 `simplify-code`，分四路检查有没有现成工具函数可复用、有没有多余状态和未释放句柄。
+- 提交前交给 `GPT-6.1-Sol (high)` 盲审。不传聊天记录，只给任务说明、真实 `git diff` 和测试输出：
+  - **第一关查规格合规**：有没有漏做（`Missing`）、有没有计划外顺手乱改的私货（`Extra`）。有私货直接打回。
+  - **第二关查代码质量与并发安全**：查连接代次泄漏、竞态和异常兜底。
+
+### 5. 修完一个典型坑，加一条静态检查（Lint-as-Memory）
+- 写进文档的规矩模型早晚会忘，写进 `check` 脚本的规矩它想犯都过不了构建。每修完一类容易重犯的错（比如手写裸 `#hex` 颜色、双层 `KeyboardInset` 嵌套、语言包 key 缺失），顺手往检查脚本里加一条拦截规则。
+- 重要的架构演进或公式推导，用 `llm-wiki` 归档到知识库的 `index.md` 里，下次开新窗口读一页索引就能接着干。
+
+---
+
+## 仓库内置的 20 个技能与开源协议
+
+所有内置技能均放在 [`skills/`](./skills) 下，完整版权声明与修改记录见 [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md)：
+
+| 分类 | 技能目录 | 作用 | 上游来源与协议 |
+| :--- | :--- | :--- | :--- |
+| **工程主线与架构** | `rigorous-dev` | 串起前置拷问、两轮重置、无头验证、几何测量与盲审的主工作流 | MIT (`Nous Research` / 本仓库扩展) |
+| | `grill-me` | 写码前按决策树拷问未知分支，带推荐选项 | MIT (`mattpocock/skills`) |
+| | `improve-codebase-architecture` | 找出浅模块并拦截 AI 易踩的 3 类架构红旗 (`design-red-flags.md`) | MIT (`mattpocock/skills` + `cursor/pstack`) |
+| | `typescript-best-practices` | 可辨识联合、Branded Types、Zod 边界解析与穷尽检查 | MIT (`cursor/plugins/pstack`) |
+| | `blast-radius` | 跨模块改动影响面审计与 5 级运行态证据梯 | MIT (`cursor/plugins/pstack`) |
+| | `statechart` | 调用 SANY + TLC 将 TLA+ 规范编译为 Mermaid 状态图与最短反例（已适配 Windows/POSIX） | MIT (`cursor/plugins/pstack`) |
+| | `benchmark-checklist` | 汇报性能与容量数据前的 7 问核查单 | MIT (`cursor/plugins/pstack`) |
+| | `simplify-code` | 从复用、质量、性能、抽象层级四路清理近期代码改动 | MIT (`Nous Research`) |
+| | `subagent-driven-development` | 子智能体执行与两阶段（规格 → 质量）独立审查 | MIT (`obra/superpowers`) |
+| | `agent-merge-conflict-arbiter` | 基于双边提交意图与测试验证的中立合并冲突仲裁 | MIT (`Nous Research`) |
+| **UI、动效与多端** | `vercel-react-native-skills` | React Native 与 Expo 列表、布局、原生模块 58 条规范 | MIT (`vercel-labs/agent-skills`) |
+| | `animate-expo` | Expo / Reanimated 4 动效频率门禁（高频操作禁动画）与 UI 线程手势 | MIT (`emilkowalski/skills`) |
+| | `break-ui` | 用真实极限脏数据（长德语词、长邮箱、0/1/1000 列表）压测 UI 布局 | MIT (`emilkowalski/skills`) |
+| | `mobile-native` | 修复移动端网页/WebView 的 `:hover` 粘滞、`100dvh`、输入框放大等 10 个破绽 | MIT (`emilkowalski/skills`) |
+| | `write-swift` | Swift 6.3/6.4 值类型建模与 Approachable Concurrency 递进并发规范 | MIT (`emilkowalski/skills`) |
+| | `emil-design-eng` | Emil Kowalski 的 UI 细节与 `<300ms ease-out` 动效判断标准 | MIT (`emilkowalski/skills`) |
+| | `impeccable` | 覆盖排版、色彩对比、层次与反 AI 模板化的前端设计规范 | Apache-2.0 (`pbakaus/impeccable`) |
+| | `frontend-design` | 构建有辨识度的前端视觉方向与排版选择 | Apache-2.0 (`anthropics/skills`) |
+| **写作与知识库** | `humanizer` | 对照 34 类常见 AI 写作套路，洗掉空话与机械句式 | MIT (`blader/humanizer`) |
+| | `llm-wiki` | 用 `raw/` + `concepts/` + `index.md` 维护可持续演进的 Markdown 知识库 | MIT (`Nous Research`) |
+
+---
+
+## 目录结构
 
 ```text
 .
-├── README.md                          # 中文主文档（五人团队 + 五步流水线 + 快速配置）
-├── README.en.md                       # 英文文档 (English Documentation)
-├── LICENSE                            # MIT 开源许可
+├── README.md                          # 中文说明
+├── README.en.md                       # 英文说明 (English README)
+├── LICENSE                            # 仓库自有内容 MIT 协议
+├── THIRD_PARTY_NOTICES.md             # 20 个内置技能的完整上游版权、修改说明与 MIT / Apache-2.0 协议全文
+├── assets/
+│   ├── model-routing.svg              # 五角色模型路由与配额隔离架构图
+│   └── pipeline.svg                   # 五步工程验证与两轮重置流程图
 ├── configs/
-│   └── hermes-config.example.yaml     # 脱敏版 Hermes 核心路由、子智能体与防死循环配置
+│   └── hermes-config.example.yaml     # Hermes 模型、子智能体轮询与防死循环配置模板
 ├── scripts/
-│   └── setup-magpie-groups.sh         # Magpie 路由组一键配置与冒烟测试脚本
-├── skills/
-│   └── rigorous-dev/
-│       └── SKILL.md                   # 集成全部高手护栏的 /rigorous-dev 技能定义
+│   ├── install-skills.sh              # 一键安装 20 个技能到 Hermes / Claude Code / Cursor / .agents
+│   └── setup-magpie-groups.sh         # 一键配置 Magpie 路由组 (work / edit / review / duty)
+├── skills/                            # 开箱即用的 20 个分类技能包（含各自脚本、参考文档与 LICENSE）
+│   ├── autonomous-ai-agents/
+│   ├── creative/
+│   ├── research/
+│   └── software-development/
 └── docs/
-    ├── benchmarks-2026-11.md          # 2026-11 海外与国产主力大模型 Benchmark 核实报告
-    └── power-user-patterns.md         # 顶尖 AI 工程师工作流与 UI 视觉闭环深度拆解
+    ├── benchmarks-2026-11.md          # 2026-11 主力模型实测基准对比表
+    └── power-user-patterns.md         # 工程护栏与视觉验收方法拆解
 ```
 
 ## License
 
-MIT License
+本仓库自有配置、脚本、图表与文档采用 [MIT License](./LICENSE)。`skills/` 下内置的第三方开源技能各自遵循其上游的 **MIT License** 或 **Apache License 2.0**，详见每个技能目录内的 `LICENSE` 文件及根目录 [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md)。
