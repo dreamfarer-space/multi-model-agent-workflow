@@ -53,6 +53,13 @@ If you use Hermes Agent, save these options into your configuration (see `config
 ```bash
 hermes config set model.default antigravity/gemini-4-argon
 hermes config set delegation.model group/work
+hermes config set delegation.max_concurrent_children 5
+hermes config set delegation.independent_completions true
+hermes config set delegation.prefix_stagger_seconds 8
+hermes config set delegation.child_timeout_seconds 1800
+hermes config set delegation.max_summary_chars 8000
+hermes config set terminal.timeout 600
+hermes config set tool_loop_guardrails.hard_stop_enabled true
 hermes config set auxiliary.compression.model minimax-code/MiniMax-M3.1-Flash
 hermes config set auxiliary.review.model codex/gpt-6.1-sol
 hermes config set auxiliary.background_review.model codex/gpt-6.1-sol

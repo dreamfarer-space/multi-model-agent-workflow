@@ -24,7 +24,11 @@ delegation:
   provider: magpie
   reasoning_effort: high
   max_iterations: 250
-  max_concurrent_children: 10
+  max_concurrent_children: 5
+  independent_completions: true
+  prefix_stagger_seconds: 8
+  child_timeout_seconds: 1800
+  max_summary_chars: 8000
   worktree_isolation: true
   fallback_providers:
     - provider: magpie
@@ -38,11 +42,14 @@ delegation:
       base_url: http://127.0.0.1:3425/v1
 
 # -----------------------------------------------------------------------------
-# Loop Guardrails: Stop stuck subagents without cutting legitimate long tasks
+# Terminal & Loop Guardrails: Prevent build timeouts and infinite failure loops
 # -----------------------------------------------------------------------------
+terminal:
+  timeout: 600
+
 tool_loop_guardrails:
   warnings_enabled: true
-  hard_stop_enabled: false
+  hard_stop_enabled: true
   non_interactive_hard_stop_enabled: true
   warn_after:
     exact_failure: 2

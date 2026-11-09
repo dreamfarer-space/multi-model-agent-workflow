@@ -26,8 +26,15 @@
    - **回传预算**：强制每个子智能体只回传 **≤50 行的浓缩结论 + 精确 `file:line`**，严禁将几万行原始代码或日志倒进主会话。
 2. **耦合代码单人主刀，拒绝碎裂并发写**：
    - 相互接线的 UI 组件、Store 状态与路由导航必须由主会话同一写作者完成。
-   - 多国语言文件（如 `locales/*.ts`）由单子智能体一次性对齐，严禁拆成 5 个以上并发写任务互相踩踏。
-3. **跨会话账本与 `LLM Wiki`**：
+   - 多国语言文件（如 `locales/*.ts`）由单子智能体一次性对齐，单批子智能体并发严格锁死在 **≤5 路**（`delegation.max_concurrent_children: 5`），严禁拆成 5 个以上并发写任务互相踩踏。
+3. **独立回调、错峰热缓存与摘要限流（防 30 分钟长尾阻塞与上下文雪崩）**：
+   - 开启 `delegation.independent_completions: true`，让先完成的子智能体立即回调，避免整批任务被最慢的单个子智能体拖住半小时。
+   - 开启 `delegation.prefix_stagger_seconds: 8`，让并发批次的首个子智能体先行预热 Prompt Cache 并错开请求峰值，防止瞬间并发打爆网关触发 `429` 掉入免费慢速兜底池。
+   - 将 `delegation.max_summary_chars` 收紧至 `8000` 并开启 `child_timeout_seconds: 1800`，防止单次超长回调直接把主会话顶进 60 秒同步压缩导致状态失忆。
+4. **子智能体 Worktree 自动归档生命周期与防拒写铁律**：
+   - 开启 `delegation.worktree_isolation: true` 时，子智能体在 `<repo>/.worktrees/subagent-<id>` 中运行，但**一旦子智能体结束退出，Hermes 会自动将该物理目录归档（至 `refs/hermes/archive/...`）并从磁盘移除**。父智能体收到回调后**严禁执行 `cd .worktrees/subagent-*`**，而应直接通过保留的分支 `hermes-subagent/subagent-<id>`（`git log/diff/merge`）或 `hermes worktree restore` 整合改动。
+   - 修改已存在文件一律优先使用 `patch`；若必须用 `write_file` 覆盖已有文件，当前会话必须先完整 `read_file` 全文（不可仅分页读局部），消除 `Refusing to overwrite` 报错。
+5. **跨会话账本与 `LLM Wiki`**：
    - 长期知识不靠翻聊天记录，而是用 `raw/`（只读源）+ `concepts/` + `index.md` 维护结构化 Wiki；新会话启动先读 `index.md`。
 
 ---
