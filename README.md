@@ -76,7 +76,8 @@
 1. **耦合代码 1 人主刀，严禁碎裂并发写**：
    - 相互接线的 UI 组件、Store 状态同步、路由导航，**必须由主窗口 `Argon` 自己一刀改完**（完全独立的模块最多派 1~2 个带 `worktree_isolation: true` 的子智能体）。
    - 多国语言字典（如 7 个 `locales/*.ts`）由 `Argon` 改好主语言后，**只派 1 个 `Gemini 3.8 Flash` 子智能体一次性同步其余语言**，严禁拆成多个并发写任务。
-2. **设计 Token 铁律、动效频率门禁与 `// WHY:` 注释规范**：
+2. **设计 Token 铁律、TS 类型防呆、动效频率门禁与 `// WHY:` 注释规范**：
+   - **TypeScript 严格建模（`typescript-best-practices`）**：用可辨识联合（Discriminated Unions）代替散落的布尔值消除非法状态组合；边界一次性解析（`z.infer<typeof Schema>`）；ID 使用 Branded Types 守卫而非 `as` 强转；迁移/刷新/重试操作必须**幂等（读当前状态只补差额）**。
    - 前端/移动端严格遵循 `vercel-react-native-skills`、`animate-expo`、`mobile-native`、`write-swift`（iOS Swift 6 并发与值类型）以及 `impeccable` / `emil-design-eng`：只准引用 `theme.ts` / `DESIGN.md` 中的语义 Token，禁止手写 `#hex` 颜色与魔法数字；**高频动作（100+ 次/天，如切 Tab、开关键盘、快捷键面板）一律 `animation: 'none'`**，动效只走 GPU `transform`/`opacity`（<300ms `ease-out`，严禁 `scale(0)`）。
    - **禁止写复述代码表面意思的废话注释**（如 `// 更新状态`）；**强制保留解释平台特殊坑或协议边界的 `// WHY:` 护栏注释**（防止后续智能体误删保命逻辑）。
 3. **两轮不过立即掀桌（Two-Strike Reset Rule）**：
@@ -84,10 +85,11 @@
    - 记录“已证伪的假设（哪条路走不通）”，回到根因重新规划，或单回合调用 `Opus 5.5` 救场。
 
 ### 第 3 步：三层机器自检闭环（不靠肉眼猜）
-1. **第 1 层：无头状态机乱序模拟 / TLA+ 验算（先于模拟器）**
-   - 涉及断线重连、选中态回写、轮询竞态、权限审批，先将状态转换抽离为纯逻辑，跑无头随机序列测试（如乱序组合 `连上 → 断网 → 切会话 → 删除 → 迟到响应`）或 TLA+ 模型检验，1 秒内验证状态不变量。
-2. **第 2 层：构建、类型与目标回归**
-   - 运行目标包的 `check`、`test` 与构建产物校验脚本，必须取得真实 Exit Code 0 输出。
+1. **第 1 层：无头状态机乱序模拟 / TLA+ `statechart` 验算（先于模拟器）**
+   - 涉及断线重连、选中态回写、轮询竞态、权限审批，先将状态转换抽离为纯逻辑，跑无头随机序列测试，或使用 `pstack/statechart` 将 `.tla` 规范编译为 Mermaid 状态图（`chart.mmd`）与最短反例路径，1 秒内验证状态不变量。
+2. **第 2 层：构建、类型、目标回归与 `blast-radius` 5 级证据链**
+   - 运行目标包的 `check`、`test` 与构建产物校验脚本，必须取得真实 Exit Code 0 输出；
+   - **爆破半径核查（`blast-radius`）**：找出“本次跨模块改动之所以安全，唯一依赖的那个前提假设”，并用第 4/5 级真实运行证据证明它（未跑过的调用方必须显式标注 `UNPROVEN`）；性能数据汇报必须过 `benchmark-checklist` 7 问门禁。
 3. **第 3 层：`break-ui` 极限脏数据压测 + UI 几何结构树算坐标 → 最终截图**
    - **先喂最坏真实数据（`break-ui`）**：用 30 字符德语复合词、65 字符无空格长邮箱、单字母短名、`0 / 1 / 1,000+` 条列表数据压测组件，排查 `min-width: 0` 缺失、头像挤压与多语言爆框；
    - **结构树 = 事实，几何 = 度量，截图 = 证据**：再通过 Android `uiautomator dump` 检查控件 `bounds=[x1,y1][x2,y2]`（或 Web DOM `getBoundingClientRect`），确认无横向溢出、无文字截断、软键盘弹出后输入框仍在可见区域内；
@@ -139,9 +141,13 @@ hermes skills repair-official --restore -y grill-me
 hermes skills repair-official --restore -y agent-merge-conflict-arbiter
 hermes skills repair-official --restore -y subagent-driven-development
 
-# 社区顶流技能安装
+# 社区顶流技能安装 (Vercel / Matt Pocock / Emil Kowalski / Cursor pstack / Anthropic)
 hermes skills install -y --category software-development vercel-labs/agent-skills/skills/react-native-skills
 hermes skills install -y --category software-development mattpocock/skills/skills/engineering/improve-codebase-architecture
+hermes skills install -y --category software-development cursor/plugins/pstack/skills/typescript-best-practices
+hermes skills install -y --category software-development cursor/plugins/pstack/skills/blast-radius
+hermes skills install -y --category software-development cursor/plugins/pstack/skills/benchmark-checklist
+hermes skills install -y --category software-development cursor/plugins/pstack/skills/statechart
 hermes skills install -y --category software-development emilkowalski/skills/skills/animate-expo
 hermes skills install -y --category software-development emilkowalski/skills/skills/mobile-native
 hermes skills install -y --category software-development emilkowalski/skills/skills/write-swift

@@ -31,12 +31,12 @@ See [`docs/benchmarks-2026-11.md`](./docs/benchmarks-2026-11.md) for the full be
    - Use `grill-me` to resolve open design branches with recommended options (never ask the user for facts discoverable in the repo) and lock `Out of Scope` files before editing.
 2. **Stage 2 — Focused Execution & Two-Strike Reset**:
    - Keep tightly coupled UI/store edits under a single writer (`Argon` in the main session); never fragment coupled files or multi-locale updates across 5+ concurrent writers.
-   - Follow `vercel-react-native-skills`, `animate-expo` (frequency gate & UI-thread worklets), `mobile-native` (`100dvh`, `@media (hover: hover)`, 16px inputs), `write-swift` (Swift 6 approachable concurrency & value types), `impeccable`, and `emil-design-eng` (semantic theme tokens only; `ease-out` <300ms; never `scale(0)`).
+   - Follow `typescript-best-practices` (discriminated unions, boundary Zod parsing, branded types, idempotent operations), `vercel-react-native-skills`, `animate-expo` (frequency gate & UI-thread worklets), `mobile-native` (`100dvh`, `@media (hover: hover)`, 16px inputs), `write-swift` (Swift 6 approachable concurrency & value types), `impeccable`, and `emil-design-eng` (semantic theme tokens only; `ease-out` <300ms; never `scale(0)`).
    - Write `// WHY:` comments only (banning AI slop comments that restate what code does).
    - **Two-Strike Rule**: If two consecutive fix attempts fail, stop patching in place, record the falsified hypothesis, and re-plan from root cause.
 3. **Stage 3 — 3-Layer Machine Verification**:
-   - **Layer 1**: Headless state-machine simulation / TLA+ model checking for concurrency, reconnection, and selection state before launching an emulator.
-   - **Layer 2**: Automated `check`, `test`, and bundle/capacity budget assertions.
+   - **Layer 1**: Headless state-machine simulation / TLA+ model checking & `statechart` Mermaid compilation for concurrency, reconnection, and selection state before launching an emulator.
+   - **Layer 2**: Automated `check`, `test`, `blast-radius` 5-level evidence ladder (proving load-bearing cross-module assumptions via execution), and `benchmark-checklist` assertions.
    - **Layer 3**: Worst-case realistic fixture stress-testing (`break-ui`) + UI hierarchy geometry checks (`uiautomator dump` `bounds` or DOM `getBoundingClientRect`) before final screenshot verification.
 4. **Stage 4 — Simplification & 2-Stage Cross-Family Blind Review**:
    - Optional 4-agent `simplify-code` pass (`Reuse`, `Quality`, `Efficiency`, `Altitude`).

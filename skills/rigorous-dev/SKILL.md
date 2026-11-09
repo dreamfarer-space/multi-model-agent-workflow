@@ -8,14 +8,14 @@ platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [debugging, tdd, verification, code-review, tla-plus, workflow]
-    related_skills: [systematic-debugging, test-driven-development, requesting-code-review, github, grill-me, simplify-code, impeccable, vercel-react-native-skills, animate-expo, break-ui, mobile-native, emil-design-eng, write-swift]
+    related_skills: [systematic-debugging, test-driven-development, requesting-code-review, github, grill-me, simplify-code, impeccable, vercel-react-native-skills, animate-expo, break-ui, mobile-native, emil-design-eng, write-swift, typescript-best-practices, blast-radius, statechart, benchmark-checklist]
 ---
 
 # Rigorous Development Workflow (`/rigorous-dev`)
 
 ## When to Use
 
-Use when fixing bugs, adding features, or running a multi-agent engineering workflow that requires root-cause reproduction, anti-regression tests/lints, real verification evidence, and independent review. Load `systematic-debugging`, `test-driven-development`, `requesting-code-review`, `github`, `grill-me`, `simplify-code`, `impeccable`, `emil-design-eng`, `vercel-react-native-skills`, `animate-expo`, `break-ui`, `mobile-native`, or `write-swift` via `skill_view` whenever deeper step-by-step guidance is needed.
+Use when fixing bugs, adding features, or running a multi-agent engineering workflow that requires root-cause reproduction, anti-regression tests/lints, real verification evidence, and independent review. Load `systematic-debugging`, `test-driven-development`, `requesting-code-review`, `github`, `grill-me`, `simplify-code`, `typescript-best-practices`, `blast-radius`, `statechart`, `benchmark-checklist`, `impeccable`, `emil-design-eng`, `vercel-react-native-skills`, `animate-expo`, `break-ui`, `mobile-native`, or `write-swift` via `skill_view` whenever deeper step-by-step guidance is needed.
 
 ## Hard Rules
 
@@ -25,9 +25,11 @@ Use when fixing bugs, adding features, or running a multi-agent engineering work
    - For ambiguous or multi-branch features, use `grill-me` to resolve open design decisions with recommended options first, and explicitly lock `Out of Scope` files/modules and build/capacity budgets before writing code.
    - **Two-strike reset rule**: if two consecutive fix attempts on the same issue fail, stop patching in place, record the falsified hypothesis, and re-plan from root cause rather than stacking a third speculative patch.
 
-2. **Lint-as-Memory, Headless State Verification & Build Budgets**
-   - **Lint-as-Memory**: Every bug fix or feature must add an executable regression test or static check/lint rule (e.g., banning raw `#hex` colors outside theme tokens, duplicate nested `KeyboardInset`, locale key mismatches, or forbidden imports in client/hot-path files) so `check` fails immediately if any agent reintroduces the pattern.
-   - **Headless Simulation & TLA+ Before Emulator UI**: Decouple state-machine logic (reconnection, selection sync, polling races, approvals) from UI components and verify randomized action sequences in headless unit tests or the TLA+ model checker (`java -XX:+UseParallelGC -cp "$TLA2TOOLS_JAR" tlc2.TLC`) before launching an emulator.
+2. **Lint-as-Memory, Headless State Verification, Type Discipline & Build Budgets**
+   - **Lint-as-Memory & Build-the-Lever (`pstack`)**: Every non-trivial bug fix or feature must add an executable behavioral regression test (breaking observable behavior must fail; refactoring internals must pass), reusable verifier script, or static lint rule (e.g., banning raw `#hex` colors outside theme tokens, duplicate nested `KeyboardInset`, locale key mismatches, or forbidden imports in client/hot-path files) so `check` fails immediately if any agent reintroduces the pattern.
+   - **Type-System Discipline & Idempotent Operations (`typescript-best-practices`)**: Make illegal states unrepresentable with discriminated unions instead of boolean flags; parse untrusted inputs once at the boundary (`z.infer<typeof Schema>`); use branded types with type guards rather than `as` assertions; make state migrations, credential refreshes, and retries idempotent (read current state and apply only the delta).
+   - **Headless Simulation & TLA+ `statechart` Before Emulator UI**: Decouple state-machine logic (reconnection, selection sync, polling races, approvals) from UI components and verify randomized action sequences in headless unit tests or the TLA+ model checker / `statechart` Mermaid compiler (`java -XX:+UseParallelGC -cp "$TLA2TOOLS_JAR" tlc2.TLC`) before launching an emulator.
+   - **Blast-Radius Evidence Ladder (`blast-radius`) & Benchmark Gate (`benchmark-checklist`)**: Identify the load-bearing assumption that makes a cross-module change safe and prove it through real execution (or mark unverified callers `UNPROVEN`); run `benchmark-checklist` before reporting any performance metric.
    - **Filepath Boundaries & Build Budgets**: Enforce environment and hot-path boundaries (such as client-only bundles or embedded render/ISR hot loops that must not block or allocate) and assert size/row/memory budgets in automated checks.
    - **Comments Policy (`// WHY:` Only)**: Never write AI slop comments that restate what the next line does; only write comments explaining non-obvious platform quirks, protocol invariants, or why a guard must not be removed (`// WHY: ...`).
 
