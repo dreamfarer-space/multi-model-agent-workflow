@@ -7,8 +7,7 @@
 [![Works with](https://img.shields.io/badge/Works%20with-Hermes%20%7C%20Claude%20Code%20%7C%20Cursor-orange.svg?style=flat-square)](#最快上手)
 [![Language](https://img.shields.io/badge/Language-English%20%7C%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-lightgrey.svg?style=flat-square)](./README.en.md)
 
-<p>别拿最贵的旗舰模型挂在主窗口翻几千行文件，也别让七个子智能体同时改你的业务分支。<br>
-这里是一套按真实工程痛点搭出来的多模型协作流，外加开箱即用的 20 个高频工程技能。</p>
+<p>一套按照真实工程痛点搭出来的多模型协作流，外加开箱即用的 20 个高频工程技能。</p>
 
 [English](./README.en.md) · **简体中文** · [实测基准](./docs/benchmarks-2026-11.md) · [工程模式拆解](./docs/power-user-patterns.md)
 
@@ -16,9 +15,9 @@
 
 ---
 
-做全栈 TypeScript、React Native、Swift 和嵌入式开发时，我常被两件事搞崩：
+在vibe coding 过程中，我常被两件事搞崩：
 
-一是**额度烧得不明不白，速度还慢得像死机**。拿推理成本极高的主力模型去跑全局 `grep`，或者把所有子任务塞给同一个免费慢模型排队。结果主会话额度撑不过半天，子任务通道全堵死。
+一是**额度烧得快，速度还很慢**。拿推理成本极高的主力模型去跑全局 `grep`，或者把所有子任务塞给同一个免费慢模型排队。结果主会话额度撑不过半天，子任务通道全堵死。
 
 二是**并发写代码搞出分支灾难**。让好几个子智能体同时碰互相依赖的前端组件、状态流和多语言字典，半小时后代码冲突到连测试都跑不起来，只能全盘回滚。
 
