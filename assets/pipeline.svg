@@ -1,95 +1,104 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="pipe-title pipe-desc">
-  <title id="pipe-title">Five-Stage Engineering Pipeline and Guardrails</title>
-  <desc id="pipe-desc">Five sequential stages: 1. Recon and Grill-Me Gate, 2. Single-Writer Execution, 3. Three-Layer Verification, 4. Simplify and Blind Review, 5. Lint-as-Memory and LLM Wiki.</desc>
-  <style>
-    .bg { fill: #f8fafc; }
-    .stage { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; rx: 8; }
-    .stage-gate { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.75; rx: 8; }
-    .stage-verify { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.75; rx: 8; }
-    .stage-review { fill: #fffbeb; stroke: #d97706; stroke-width: 1.75; rx: 8; }
-    .num { font: 700 12px "SFMono-Regular", Consolas, monospace; fill: #1e293b; }
-    .title { font: 700 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; fill: #0f172a; }
-    .item { font: 400 11.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; fill: #334155; }
-    .skill { font: 600 11px "SFMono-Regular", Consolas, monospace; fill: #2563eb; }
-    .arrow { stroke: #64748b; stroke-width: 1.75; fill: none; }
-    .reset { stroke: #dc2626; stroke-width: 1.5; stroke-dasharray: 4,3; fill: none; }
-    .reset-text { font: 600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; fill: #dc2626; }
-  </style>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="pipe-title pipe-desc">
+  <title id="pipe-title">Five-Stage Engineering Pipeline and Two-Strike Reset Loop</title>
+  <desc id="pipe-desc">Five sequential stages: 1. Recon and Grill-Me Gate, 2. Single-Writer Execution, 3. Three-Layer Machine Verification, 4. Simplify and Blind Review, 5. Lint-as-Memory and LLM Wiki, with a Two-Strike Reset loop.</desc>
   <defs>
     <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b"/>
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#475569"/>
     </marker>
-    <marker id="arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <marker id="arrRed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 8 5 L 0 9 z" fill="#dc2626"/>
     </marker>
+    <filter id="cardShadow" x="-2%" y="-2%" width="104%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
   </defs>
 
-  <rect class="bg" width="960" height="300" rx="12"/>
+  <rect width="960" height="320" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
 
-  <!-- Stage 1 -->
-  <rect x="20" y="28" width="172" height="210" class="stage-gate"/>
-  <text x="32" y="50" class="num">STAGE 1</text>
-  <text x="32" y="70" class="title">Recon &amp; Hard Gate</text>
-  <text x="32" y="96" class="item">• 3–5 read-only workers</text>
-  <text x="32" y="114" class="item">  return ≤50 lines each</text>
-  <text x="32" y="136" class="item">• Resolve design tree</text>
-  <text x="32" y="154" class="item">• Lock Out-of-Scope files</text>
-  <text x="32" y="196" class="skill">grill-me</text>
-  <text x="32" y="214" class="skill">improve-architecture</text>
+  <g filter="url(#cardShadow)">
+    <rect x="20" y="24" width="170" height="226" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="1.75"/>
+    <path d="M 20 34 Q 20 24 30 24 L 180 24 Q 190 24 190 34 L 190 56 L 20 56 Z" fill="#eff6ff"/>
+    <text x="32" y="45" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="700" fill="#1d4ed8">STEP 1 · 探路与立规矩</text>
+    <text x="32" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="600" fill="#0f172a">只读侦察 + 决策树</text>
+    <text x="32" y="100" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• 3–5 路子任务并行查代码</text>
+    <text x="32" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• 只回传 ≤50 行结论</text>
+    <text x="32" y="136" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• 提 2–3 道选择题定分支</text>
+    <text x="32" y="154" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• 锁死 Out-of-Scope</text>
+    <rect x="30" y="176" width="150" height="58" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="38" y="194" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#2563eb">grill-me</text>
+    <text x="38" y="210" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#2563eb">improve-architecture</text>
+    <text x="38" y="226" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">design-red-flags.md</text>
+  </g>
 
-  <path d="M 192 133 L 208 133" class="arrow" marker-end="url(#arr)"/>
+  <path d="M 190 137 L 208 137" fill="none" stroke="#475569" stroke-width="1.75" marker-end="url(#arr)"/>
 
-  <!-- Stage 2 -->
-  <rect x="210" y="28" width="172" height="210" class="stage"/>
-  <text x="222" y="50" class="num">STAGE 2</text>
-  <text x="222" y="70" class="title">Focused Execution</text>
-  <text x="222" y="96" class="item">• 1 writer for coupled UI</text>
-  <text x="222" y="114" class="item">• 1 worker for all locales</text>
-  <text x="222" y="136" class="item">• Theme tokens &amp; // WHY:</text>
-  <text x="222" y="154" class="item">• Discriminated unions</text>
-  <text x="222" y="196" class="skill">typescript-best-prac</text>
-  <text x="222" y="214" class="skill">animate-expo / swift</text>
+  <g filter="url(#cardShadow)">
+    <rect x="210" y="24" width="170" height="226" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+    <path d="M 210 34 Q 210 24 220 24 L 370 24 Q 380 24 380 34 L 380 56 L 210 56 Z" fill="#f1f5f9"/>
+    <text x="222" y="45" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="700" fill="#334155">STEP 2 · 集中主刀写码</text>
+    <text x="222" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="600" fill="#0f172a">防互踩 + 类型防呆</text>
+    <text x="222" y="100" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• 耦合组件 Argon 1人改</text>
+    <text x="222" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• 语言包 1个子任务全包</text>
+    <text x="222" y="136" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• 可辨识联合 &amp; 幂等操作</text>
+    <text x="222" y="154" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• 只留 // WHY: 护栏注释</text>
+    <rect x="220" y="176" width="150" height="58" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="228" y="194" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#2563eb">typescript-best-prac</text>
+    <text x="228" y="210" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#2563eb">animate-expo / swift</text>
+    <text x="228" y="226" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">impeccable / mobile</text>
+  </g>
 
-  <path d="M 382 133 L 398 133" class="arrow" marker-end="url(#arr)"/>
+  <path d="M 380 137 L 398 137" fill="none" stroke="#475569" stroke-width="1.75" marker-end="url(#arr)"/>
 
-  <!-- Stage 3 -->
-  <rect x="400" y="28" width="172" height="210" class="stage-verify"/>
-  <text x="412" y="50" class="num">STAGE 3</text>
-  <text x="412" y="70" class="title">3-Layer Verification</text>
-  <text x="412" y="96" class="item">1. Headless / TLA+ chart</text>
-  <text x="412" y="114" class="item">2. check + test + blast</text>
-  <text x="412" y="136" class="item">3. break-ui dirty data +</text>
-  <text x="412" y="154" class="item">   bounds → screenshot</text>
-  <text x="412" y="196" class="skill">statechart / break-ui</text>
-  <text x="412" y="214" class="skill">blast-radius</text>
+  <g filter="url(#cardShadow)">
+    <rect x="400" y="24" width="170" height="226" rx="10" fill="#ffffff" stroke="#16a34a" stroke-width="1.75"/>
+    <path d="M 400 34 Q 400 24 410 24 L 560 24 Q 570 24 570 34 L 570 56 L 400 56 Z" fill="#f0fdf4"/>
+    <text x="412" y="45" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="700" fill="#15803d">STEP 3 · 三层机器验证</text>
+    <text x="412" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="600" fill="#0f172a">逻辑 → 构建 → 几何</text>
+    <text x="412" y="100" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">1. 无头乱序 / TLA+ 状态图</text>
+    <text x="412" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">2. check + 爆破半径实跑</text>
+    <text x="412" y="136" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">3. break-ui 脏数据压测</text>
+    <text x="412" y="154" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">4. 查 bounds 坐标再看图</text>
+    <rect x="410" y="176" width="150" height="58" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="418" y="194" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#15803d">statechart (TLA+)</text>
+    <text x="418" y="210" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#15803d">blast-radius / break-ui</text>
+    <text x="418" y="226" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">benchmark-checklist</text>
+  </g>
 
-  <path d="M 572 133 L 588 133" class="arrow" marker-end="url(#arr)"/>
+  <path d="M 570 137 L 588 137" fill="none" stroke="#475569" stroke-width="1.75" marker-end="url(#arr)"/>
 
-  <!-- Stage 4 -->
-  <rect x="590" y="28" width="172" height="210" class="stage-review"/>
-  <text x="602" y="50" class="num">STAGE 4</text>
-  <text x="602" y="70" class="title">2-Stage Blind Review</text>
-  <text x="602" y="96" class="item">• 4-way code cleanup</text>
-  <text x="602" y="114" class="item">• GPT-6.1-Sol reads diff:</text>
-  <text x="602" y="136" class="item">  1) Missing / Extra</text>
-  <text x="602" y="154" class="item">  2) Race &amp; lock safety</text>
-  <text x="602" y="196" class="skill">simplify-code</text>
-  <text x="602" y="214" class="skill">benchmark-checklist</text>
+  <g filter="url(#cardShadow)">
+    <rect x="590" y="24" width="170" height="226" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="1.75"/>
+    <path d="M 590 34 Q 590 24 600 24 L 750 24 Q 760 24 760 34 L 760 56 L 590 56 Z" fill="#fffbeb"/>
+    <text x="602" y="45" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="700" fill="#b45309">STEP 4 · 瘦身与盲审</text>
+    <text x="602" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="600" fill="#0f172a">异血统两阶段审查</text>
+    <text x="602" y="100" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• 四路并发清理冗余代码</text>
+    <text x="602" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• Sol 只读任务单+diff：</text>
+    <text x="602" y="136" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">  ① 查漏做与多改私货</text>
+    <text x="602" y="154" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">  ② 查竞态与未释放锁</text>
+    <rect x="600" y="176" width="150" height="58" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="608" y="194" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#b45309">simplify-code</text>
+    <text x="608" y="210" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#b45309">subagent-driven-dev</text>
+    <text x="608" y="226" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">merge-conflict-arbiter</text>
+  </g>
 
-  <path d="M 762 133 L 778 133" class="arrow" marker-end="url(#arr)"/>
+  <path d="M 760 137 L 778 137" fill="none" stroke="#475569" stroke-width="1.75" marker-end="url(#arr)"/>
 
-  <!-- Stage 5 -->
-  <rect x="780" y="28" width="160" height="210" class="stage"/>
-  <text x="792" y="50" class="num">STAGE 5</text>
-  <text x="792" y="70" class="title">Compounding</text>
-  <text x="792" y="96" class="item">• Turn bug class into a</text>
-  <text x="792" y="114" class="item">  static check rule</text>
-  <text x="792" y="136" class="item">• Update wiki index.md</text>
-  <text x="792" y="154" class="item">  for next session</text>
-  <text x="792" y="196" class="skill">rigorous-dev</text>
-  <text x="792" y="214" class="skill">llm-wiki / humanizer</text>
+  <g filter="url(#cardShadow)">
+    <rect x="780" y="24" width="160" height="226" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+    <path d="M 780 34 Q 780 24 790 24 L 930 24 Q 940 24 940 34 L 940 56 L 780 56 Z" fill="#f1f5f9"/>
+    <text x="792" y="45" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="700" fill="#334155">STEP 5 · 复利沉淀</text>
+    <text x="792" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="600" fill="#0f172a">把坑焊进静态检查</text>
+    <text x="792" y="100" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• 典型 Bug 转成 check</text>
+    <text x="792" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">  或 verify-*.mjs 脚本</text>
+    <text x="792" y="136" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• 更新 Wiki index.md</text>
+    <text x="792" y="154" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">• 下个窗口读 1 页即接力</text>
+    <rect x="790" y="176" width="140" height="58" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="798" y="194" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#2563eb">rigorous-dev</text>
+    <text x="798" y="210" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#2563eb">llm-wiki</text>
+    <text x="798" y="226" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">humanizer</text>
+  </g>
 
-  <!-- Two-strike reset feedback loop -->
-  <path d="M 486 238 L 486 268 L 106 268 L 106 242" class="reset" marker-end="url(#arr-red)"/>
-  <text x="215" y="286" class="reset-text">Two-Strike Reset Rule: 2 failed fix attempts → stop patching, record falsified hypothesis, re-plan</text>
+  <path d="M 485 250 L 485 282 L 105 282 L 105 254" fill="none" stroke="#dc2626" stroke-width="1.75" stroke-dasharray="5,4" marker-end="url(#arrRed)"/>
+  <rect x="190" y="268" width="580" height="26" rx="13" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="208" y="285" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" font-weight="600" fill="#b91c1c">两轮重置红线 (Two-Strike Reset)：同一问题连改 2 轮未过 → 立即停手，记下已证伪假设，退回根因或调 Opus 单回合救场</text>
 </svg>

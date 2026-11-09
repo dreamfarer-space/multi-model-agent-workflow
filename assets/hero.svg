@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 250" role="img" aria-labelledby="hero-title hero-desc">
+  <title id="hero-title">Multi-Model Agent Workflow — Hermes x Magpie</title>
+  <desc id="hero-desc">Hero banner for Multi-Model Agent Workflow: Quota-isolated model routing and 20 ready-to-use engineering skills for Hermes Agent, Claude Code, and Cursor.</desc>
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="55%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#172554"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="50%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#1e293b" stroke-width="0.75"/>
+    </pattern>
+  </defs>
+
+  <rect width="960" height="250" rx="16" fill="url(#bgGrad)"/>
+  <rect width="960" height="250" rx="16" fill="url(#grid)" opacity="0.65"/>
+  <rect x="1" y="1" width="958" height="248" rx="15" fill="none" stroke="#334155" stroke-width="1.5"/>
+
+  <!-- Top eyebrow pill -->
+  <rect x="48" y="34" width="276" height="26" rx="13" fill="#1e293b" stroke="#3b82f6" stroke-width="1"/>
+  <circle cx="64" cy="47" r="4" fill="#34d399"/>
+  <text x="76" y="51" font-family="SFMono-Regular, Consolas, Menlo, monospace" font-size="11.5" font-weight="600" fill="#e2e8f0">HERMES AGENT · CLAUDE CODE · CURSOR</text>
+
+  <!-- Main Title -->
+  <text x="48" y="104" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif" font-size="34" font-weight="800" fill="#f8fafc" letter-spacing="-0.5">Multi-Model Agent Workflow</text>
+  <rect x="48" y="118" width="180" height="3.5" rx="2" fill="url(#accentGrad)"/>
+
+  <!-- Subtitle -->
+  <text x="48" y="150" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif" font-size="15.5" font-weight="400" fill="#cbd5e1">把不同模型的额度池和脾气拆开用：1 个主脑拍板改核心代码、3 路快模型轮询探路、异血统模型只看 diff 盲审。</text>
+  <text x="48" y="174" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif" font-size="14" font-weight="400" fill="#94a3b8">内置 20 个开箱即用的开源 Skill（TLA+ 状态图编译、爆破半径验证、UI 脏数据压测、TS 类型防呆）。</text>
+
+  <!-- Bottom Model Pills -->
+  <g transform="translate(48, 196)">
+    <rect x="0" y="0" width="168" height="28" rx="6" fill="#172554" stroke="#3b82f6" stroke-width="1.2"/>
+    <text x="12" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#93c5fd">Lead: Gemini 4 Argon</text>
+
+    <rect x="180" y="0" width="186" height="28" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1.2"/>
+    <text x="192" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#6ee7b7">Swarm: DeepSeek V4.1</text>
+
+    <rect x="378" y="0" width="182" height="28" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1.2"/>
+    <text x="390" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#6ee7b7">256K: MiniMax M3.1</text>
+
+    <rect x="572" y="0" width="166" height="28" rx="6" fill="#1e293b" stroke="#64748b" stroke-width="1.2"/>
+    <text x="584" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#e2e8f0">i18n: Gemini 3.8</text>
+
+    <rect x="750" y="0" width="162" height="28" rx="6" fill="#451a03" stroke="#f59e0b" stroke-width="1.2"/>
+    <text x="762" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#fcd34d">Audit: GPT-6.1 Sol</text>
+  </g>
+</svg>
