@@ -92,13 +92,13 @@ This workflow pulls together practical techniques from Boris Cherny, Jesse Vince
 
 ### 1. Scope boundaries and clarify options before touching code
 
-The main window never browses large files directly. Dispatch 3 to 5 read-only subtasks for initial reconnaissance, capping each summary at 50 lines with explicit `file:line` anchors instead of dumping raw logs.
+The main window never browses large files directly or runs >30 solo `read_file`/`patch` calls in the root session. Dispatch 3 to 5 read-only subtasks for initial reconnaissance, capping each subtask at **≤25 tool calls, ≤8 target files, and ≤50 summary lines with explicit `file:line` anchors** instead of running open-ended repo loops or dumping raw logs.
 
 Whenever hitting architectural forks or trade-offs, the main model uses `grill-me` to present 2 to 3 opinionated multiple-choice paths to lock in the plan. It also lists explicit out-of-scope files before writing code. If something can be verified directly from the codebase, the agent checks it without bothering you.
 
-### 2. Single-owner edits on coupled code, hard stop after two failed attempts
+### 2. Single-owner edits on coupled code, no same-turn multi-patch, hard stop after two failed attempts
 
-Interconnected components, shared state, and routing flows must be modified in a single uninterrupted pass by `Argon` in the main session. When updating localization copy, finish the base source file first, then dispatch one `Gemini 3.8 Flash` subtask to update the full dictionary bundle at once, avoiding concurrent writes across tasks.
+Interconnected components, shared state, and routing flows must be modified in a single uninterrupted pass by `Argon` in the main session, while independent module/test authoring is delegated to `delegate_task` (`group/work`). **Never emit multiple `patch` tool calls against the same file in a single turn** (cap at ≤3 `patch` calls across files per turn); apply multi-hunk edits sequentially or consolidate them into one replacement to prevent escape-drift and 8-failure loop-breaker halts. When updating localization copy, finish the base source file first, then dispatch one `Gemini 3.8 Flash` subtask to update the full dictionary bundle at once, avoiding concurrent writes across tasks.
 
 TypeScript conventions are strictly applied: discriminated unions replace scattered boolean flags, Zod validates types at network and storage boundaries, and state mutations must be idempotent. Comments stick to `// WHY:` explanations that document platform edge cases or protocol quirks, protecting defensive code from being cleaned up by subsequent models.
 
@@ -120,9 +120,11 @@ Before committing, hand the branch off to `GPT-6.1-Sol (high)`. The review runs 
 * First pass checks alignment against requirements: confirm nothing was skipped and no unrequested scope was slipped in.
 * Second pass inspects robustness: watch for resource leaks, race conditions, and unhandled errors.
 
-### 5. Turn past traps into static checks (Lint-as-Memory)
+### 5. Turn past traps into static checks (Lint-as-Memory) & Pre-Delivery 3-Point Gate
 
-Models eventually forget written documentation, but code cannot merge if CI fails. Whenever you resolve a tricky pitfall (such as nested paddings, hardcoded hex values, or missing translation keys), add a regex pattern or static assertion to your lint scripts.
+Models eventually forget written documentation, but code cannot merge if CI fails. Whenever you resolve a tricky pitfall (such as nested paddings, hardcoded hex values, or missing translation keys), add a regex pattern or static assertion to your lint scripts. Skills follow a **Hub-and-Spoke architecture**: keep main `SKILL.md` files under 6,000 characters and load detailed `references/` on demand so skill loading never floods the context window.
+
+Before declaring a PR complete, verify the **3-point pre-delivery gate**: (1) new resilience/recovery options default to enabled out of the box; (2) PR title and body match the target repository's primary language; (3) remote CI checks (`gh pr checks`) pass on the pushed head.
 
 For architectural decisions or system designs, use `llm-wiki` to log them under the local knowledge base index. Future sessions can pick up full context just by reading `index.md`.
 
