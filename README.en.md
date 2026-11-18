@@ -3,12 +3,11 @@
 <img src="./assets/hero.svg" alt="Multi-Model Agent Workflow" width="100%">
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](./LICENSE)
-[![Bundled Skills](https://img.shields.io/badge/Skills-20%20Bundled-success.svg?style=flat-square)](./skills)
-[![Works with](https://img.shields.io/badge/Works%20with-Hermes%20%7C%20Claude%20Code%20%7C%20Cursor-orange.svg?style=flat-square)](#quickstart)
-[![Language](https://img.shields.io/badge/Language-English%20%7C%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-lightgrey.svg?style=flat-square)](./README.en.md)
+[![Bundled Skills](https://img.shields.io/badge/Skills-40%20Bundled-success.svg?style=flat-square)](./skills)
+[![Works with](https://img.shields.io/badge/Works%20with-Antigravity%20%7C%20Hermes%20%7C%20Claude%20Code%20%7C%20Pi-orange.svg?style=flat-square)](#quickstart)
+[![Language](https://img.shields.io/badge/Language-English%20%7C%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-lightgrey.svg?style=flat-square)](./README.md)
 
-<p>Don't burn flagship model tokens scrolling through thousands of lines in the main window, and don't let seven subagents write to your active branch at once.<br>
-Here is a multi-model workflow built around real engineering friction, bundled with 20 day-to-day coding skills.</p>
+<p>A production multi-model engineering workflow with a native Antigravity plugin, sanitized cross-tool rule templates, and 40 curated engineering skills.</p>
 
 **English** · [简体中文](./README.md) · [Benchmarks](./docs/benchmarks-2026-11.md) · [Engineering Patterns](./docs/power-user-patterns.md)
 
@@ -16,42 +15,47 @@ Here is a multi-model workflow built around real engineering friction, bundled w
 
 ---
 
-When building full-stack TypeScript, React Native, Swift, and embedded apps, two issues kept breaking my flow:
+When running AI coding agents on real repositories, three failure modes keep showing up:
 
-First, burning quotas on low-leverage tasks while everything crawled to a halt. Using an expensive reasoning model to run global grep searches, or pushing every background subtask into one free, slow queue. The main window ran out of tokens before lunch, and background jobs backed up completely.
+First, burning flagship context and quota while mixing exploration with coupled edits. Reading thousands of lines in the main window or letting multiple subagents write to the same directory leaves the branch broken beyond quick recovery.
 
-Second, merge conflicts from uncontrolled concurrency. When multiple subagents touch interdependent UI components, shared state stores, and translation dictionaries at the same time, the branch won't even compile tests half an hour later, forcing a complete git reset.
+Second, confirmation bias during self-review. When the same model and chat thread that wrote the patch also reviews it, skipped edge cases, unrequested scope additions, and hollow tests slip straight through.
 
-This setup centers on a straightforward division of labor:
-1. Reserve the main window for the top-tier model to handle architecture choices and core diffs. It does best with UI screenshot checks and complex state machines.
-2. Route repo searches and routine legwork to fast models rotated across three distinct providers, avoiding rate limits on any single account.
-3. Use a completely different model family for read-only diff reviews. The model that wrote the code should not review it, and an outside model quickly flags smuggled scope changes.
+Third, relying on soft prompt reminders instead of structural enforcement. Written rules get ignored under pressure unless backed by tool-level read-only isolation, a gated 5-stage pipeline, and static checks.
+
+This setup addresses all three directly:
+1. **Strict role and tool separation**: The lead model (`Gemini 4 Hydrogen (High)` or Hermes `Argon`) owns architectural decisions and coupled core code; `research` and `scout` strip file-editing tools for bounded read-only reconnaissance with `file:line` citations; independent implementation runs in isolated worktrees or the 3-family `group/work` pool (capped at ≤5 concurrent).
+2. **5-stage hard-gated pipeline (Stage 0 – Stage 4)**: Ground with `how` + `why` + `architect` before coding; build with `systematic-debugging`, `test-value`, and `correct`; verify before push using `interrogate` (command-proven findings only) and a read-only `reviewer` (`Gemini 4 Carbon (High)` or `GPT-6.1-Sol`) auditing four mandatory dimensions; close CI with `mergeStateStatus` checks and GraphQL `resolveReviewThread`.
+3. **Portable across agent runtimes**: Install the same 40 skills and sanitized rule templates into **Google Antigravity**, **Hermes Agent**, **Pi / Claude Code**, or **Cursor**.
 
 <div align="center">
-  <img src="./assets/model-routing.svg" alt="Multi-model routing and quota isolation architecture" width="100%">
+  <img src="./assets/model-routing.svg" alt="Multi-model routing and permission isolation architecture" width="100%">
 </div>
 
 ---
 
 ## Quickstart
 
-The bundled `skills/` directory includes 20 curated engineering skills under their original upstream licenses. Clone the repo and run one script to set them up.
+This repository includes the sanitized Antigravity plugin (`plugins/workflow/`), a cross-tool rules template (`configs/AGENTS.example.md`), Hermes + Magpie templates, and **40 curated engineering skills** under their original upstream licenses.
 
 ```bash
 git clone https://github.com/dreamfarer-space/multi-model-agent-workflow.git
 cd multi-model-agent-workflow
 
-# 1. Install all 20 skills (supports hermes / claude / cursor / agents)
-bash scripts/install-skills.sh --target hermes
+# 1. Install into your target runtime (antigravity / hermes / claude / cursor / agents)
+bash scripts/install-skills.sh --target antigravity
+# Or install skills into Hermes / Claude Code / Cursor / ~/.agents:
+# bash scripts/install-skills.sh --target hermes
 
-# 2. If using the Magpie proxy gateway, set up routing groups
+# 2. (Optional) Configure Magpie routing groups
 bash scripts/setup-magpie-groups.sh
 ```
 
-If you use Hermes Agent, save these options into your configuration (see `configs/hermes-config.example.yaml` for a complete template):
+- **Pi / Claude Code users**: Copy [`configs/AGENTS.example.md`](./configs/AGENTS.example.md) to `~/.pi/agent/AGENTS.md` or `~/.claude/CLAUDE.md` to route main/worker turns through `antigravity/gemini-4-hydrogen`, independent pre-push audits through `antigravity/gemini-4-carbon`, and deadlock rescues through `antigravity/claude-opus-5-5`.
+- **Hermes Agent users**: See [`configs/hermes-config.example.yaml`](./configs/hermes-config.example.yaml) for the full configuration, or apply core settings via CLI:
 
 ```bash
-hermes config set model.default antigravity/gemini-4-argon
+hermes config set model.default antigravity/gemini-4-hydrogen
 hermes config set delegation.model group/work
 hermes config set delegation.max_concurrent_children 5
 hermes config set delegation.independent_completions true
@@ -61,103 +65,91 @@ hermes config set delegation.max_summary_chars 8000
 hermes config set terminal.timeout 600
 hermes config set tool_loop_guardrails.hard_stop_enabled true
 hermes config set auxiliary.compression.model minimax-code/MiniMax-M3.1-Flash
-hermes config set auxiliary.review.model codex/gpt-6.1-sol
+hermes config set auxiliary.review.model antigravity/gemini-4-carbon
 hermes config set auxiliary.background_review.model codex/gpt-6.1-sol
 hermes config set auxiliary.background_review.reasoning_effort high
 ```
 
 ---
 
-## Model Roles and Assignments
+## Model Roles and Dual-Stack Routing
 
-Different models have very different strengths during development. See [Benchmarks Summary](./docs/benchmarks-2026-11.md) for detailed test figures and third-party evaluation methodologies. In daily work, assign roles by capability rather than having your flagship model handle low-level chores:
-
-| Role | Route / Config | Public Benchmarks | Rationale |
+| Role | Antigravity / Pi (Current Stack) | Hermes × Magpie (Quota-Isolated Stack) | Scope & Guardrails |
 | :--- | :--- | :--- | :--- |
-| **Main Window Decisions** | `antigravity/gemini-4-argon`<br>`model.default` | DeepSWE v1.1 `77.9%`<br>GraphWalks 128K `99.7%`<br>Roboflow Vision `87.5%` | Cross-file call chain tracking and visual screenshot alignment stay solid. Initial thinking time can take ten to fifteen seconds, so keep it away from raw file crawling. Use it strictly for architectural trade-offs and touching core coupled logic. Runs on the Google AI Ultra pool with a 5-hour reset window. |
-| **Subtask Reconnaissance** | `group/work`<br>`routing=rotate, stays=turn` | DeepSeek-V4.1-Flash (`190 tok/s`)<br>MiniMax-M3.1-Flash (`166 tok/s`)<br>Gemini-3.8-Flash (`130 tok/s`) | Background subtasks rotate across Tencent, MiniMax, and Google Pro, preventing any single provider from bottlenecking your session. `stays=turn` keeps a subtask locked to one model across multi-step tool calls so state stays coherent. Backed by `workbuddy/hy4free` as a fallback. |
-| **Localization & Copy** | `antigravity/gemini-3.8-flash`<br>`group/edit` | LMArena Chinese Vision #1<br>LiveCodeBench `89.5%` | Isolated to the Google AI Pro pool to spare Ultra quota. Handles batch updates across translation dictionaries (`locales/*.ts`) and draft release notes with high single-pass throughput. |
-| **Context Compression** | `minimax-code/MiniMax-M3.1-Flash`<br>`auxiliary.compression` | LOCA-Bench 256K `60.3%` (#1 long-context retrieval)<br>Max single output `524K` | Engages automatically when long sessions trigger compaction. Strong context retention ensures previously checked `file:line` references and ruled-out hypotheses are not dropped. |
-| **Blind Review & Rescue** | Blind review: `codex/gpt-6.1-sol:high`<br>Rescue: `claude-opus-5-5` | Sol: DeepSWE `75.2%`, Instruction Following `82.0%`<br>Opus 5.5: SWE-bench Pro `89.9%` | When code is written in the main window, switch to OpenAI-lineage Sol before committing to catch oversights. Opus 5.5 quota is scarce; instead of keeping it in the main window for long runs, bring it in for a single targeted turn when the primary model fails two fix attempts in a row. |
+| **Lead & Coupled Core** | `Gemini 4 Hydrogen (High)` | `antigravity/gemini-4-argon` | Requirement convergence, two-skeleton `architect` design, coupled edits, final acceptance; never >30 solo file reads/edits in the root session. |
+| **Read-Only Scouts** | `research` (sandboxed static)<br>`scout` (CLI without write tools) | `group/work` (`DeepSeek-V4.1` / `MiniMax-M3.1` / `Gemini-3.8-Flash`) | Runtime tracing (`how`), git/PR archaeology (`why`), minimal repro; capped at **≤25 tool calls, ≤8 files, ≤50 summary lines with `file:line`**. |
+| **Parallel Implementation** | `self` (`share` / `branch` worktree)<br>`run_workflow` (Python pipeline) | `group/work` (`rotate, stays=turn`) + `worktree_isolation` | Independent modules, regression tests, single-task locale sync (**≤5 concurrent**; no same-turn multi-patch on one file). |
+| **Pre-Push Blind Review** | `Gemini 4 Carbon (High)`<br>(`plugins/workflow/agents/reviewer.md`) | `codex/gpt-6.1-sol:high`<br>(`auxiliary.review`) | **No chat history** — receives only scope, `git diff`, and test output to audit 4 mandatory dimensions; blocks push until `PASS`. |
+| **Compaction & Rescue** | Rescue: `claude-opus-5-5` | Compaction: `MiniMax-M3.1-Flash`<br>Rescue: `claude-opus-5-5` | Hard reset after two failed fix attempts or single-turn `Opus 5.5` root-cause escalation; `MiniMax` preserves `file:line` context during compaction. |
+
+See [Benchmarks Summary (2026-11)](./docs/benchmarks-2026-11.md) for measured metrics and role selection rationale.
 
 ---
 
-## Day-to-Day Engineering Workflow
+## Five-Stage Hard-Gated Pipeline (Stage 0 – Stage 4)
 
 <div align="center">
-  <img src="./assets/pipeline.svg" alt="Five-step engineering verification pipeline" width="100%">
+  <img src="./assets/pipeline.svg" alt="Five-stage hard-gated engineering pipeline" width="100%">
 </div>
 
-This workflow pulls together practical techniques from Boris Cherny, Jesse Vincent (`superpowers`), Garry Tan (`gstack`), Matt Pocock (`grill-me`), Emil Kowalski, and Lauren Tan (`cursor/pstack`). For deeper architectural rationale, see [Engineering Patterns](./docs/power-user-patterns.md).
+This workflow enforces five sequential gates (detailed in [Engineering Patterns](./docs/power-user-patterns.md)):
 
-### 1. Scope boundaries and clarify options before touching code
-
-The main window never browses large files directly or runs >30 solo `read_file`/`patch` calls in the root session. Dispatch 3 to 5 read-only subtasks for initial reconnaissance, capping each subtask at **≤25 tool calls, ≤8 target files, and ≤50 summary lines with explicit `file:line` anchors** instead of running open-ended repo loops or dumping raw logs.
-
-Whenever hitting architectural forks or trade-offs, the main model uses `grill-me` to present 2 to 3 opinionated multiple-choice paths to lock in the plan. It also lists explicit out-of-scope files before writing code. If something can be verified directly from the codebase, the agent checks it without bothering you.
-
-### 2. Single-owner edits on coupled code, no same-turn multi-patch, hard stop after two failed attempts
-
-Interconnected components, shared state, and routing flows must be modified in a single uninterrupted pass by `Argon` in the main session, while independent module/test authoring is delegated to `delegate_task` (`group/work`). **Never emit multiple `patch` tool calls against the same file in a single turn** (cap at ≤3 `patch` calls across files per turn); apply multi-hunk edits sequentially or consolidate them into one replacement to prevent escape-drift and 8-failure loop-breaker halts. When updating localization copy, finish the base source file first, then dispatch one `Gemini 3.8 Flash` subtask to update the full dictionary bundle at once, avoiding concurrent writes across tasks.
-
-TypeScript conventions are strictly applied: discriminated unions replace scattered boolean flags, Zod validates types at network and storage boundaries, and state mutations must be idempotent. Comments stick to `// WHY:` explanations that document platform edge cases or protocol quirks, protecting defensive code from being cleaned up by subsequent models.
-
-Two-strike reset rule: if a bug fix fails tests two rounds in a row, stop immediately. Adding a third layer of speculative patches is banned. Roll back to the baseline context, re-verify the original assumptions, or switch to `opus` for a single-pass root cause check.
-
-### 3. Three layers of machine validation over manual inspection
-
-Isolate state machine logic first. When dealing with reconnects, preemption, or permission flows, extract the state logic into standalone permutations tests, or use `statechart` to run TLC and output TLA+ specs directly as Mermaid diagrams with minimal counterexample traces.
-
-Verify against real runtime evidence. After unit tests pass, use `blast-radius` to trace cross-module dependencies down to the core assumption and verify it with a minimal test script. Mark any call site without live runtime proof as `UNPROVEN`. Performance claims must complete all 7 checks in `benchmark-checklist`.
-
-Stress-test visual layouts with edge-case data. Run `break-ui` using long German compound words, oversized email addresses, and boundary empty/full collections. Inspect layout metrics using Android `bounds` or DOM `getBoundingClientRect` coordinates, then feed light and dark mode screenshots back to the main model for final verification.
-
-### 4. Code pruning and cross-lineage blind review
-
-For sizable diffs, run `simplify-code` to identify existing library helpers, unclosed event listeners, and redundant component state.
-
-Before committing, hand the branch off to `GPT-6.1-Sol (high)`. The review runs without earlier chat history, receiving only the task prompt, the actual `git diff`, and test output:
-* First pass checks alignment against requirements: confirm nothing was skipped and no unrequested scope was slipped in.
-* Second pass inspects robustness: watch for resource leaks, race conditions, and unhandled errors.
-
-### 5. Turn past traps into static checks (Lint-as-Memory) & Pre-Delivery 3-Point Gate
-
-Models eventually forget written documentation, but code cannot merge if CI fails. Whenever you resolve a tricky pitfall (such as nested paddings, hardcoded hex values, or missing translation keys), add a regex pattern or static assertion to your lint scripts. Skills follow a **Hub-and-Spoke architecture**: keep main `SKILL.md` files under 6,000 characters and load detailed `references/` on demand so skill loading never floods the context window.
-
-Before declaring a PR complete, verify the **3-point pre-delivery gate**: (1) new resilience/recovery options default to enabled out of the box; (2) PR title and body match the target repository's primary language; (3) remote CI checks (`gh pr checks`) pass on the pushed head.
-
-For architectural decisions or system designs, use `llm-wiki` to log them under the local knowledge base index. Future sessions can pick up full context just by reading `index.md`.
+1. **Stage 0 · Scope & Grounding**: Check target `AGENTS.md` and upstream baseline, **never branch directly in the main working tree** (use an isolated `git worktree`); ground with `how` and `why` before altering safeguards, sketch two distinct shapes with `architect`, and lock decisions + `Out of Scope` with `grill-me`.
+2. **Stage 1 · Locate, Implement & Guard**: Build a tight failing loop first with `systematic-debugging` (or throwaway `spike`); follow `test-value` (**strict ban on `node:vm` / `eval` / `new Function` in tests**); eliminate recurring mistake classes at the highest effective level with `correct` (Architecture → Types → Lint → Behavioral Tests → Docs); prune bloat with `simplify-codebase`.
+3. **Stage 2 · Local Gates & Pre-Push Audit**: Fetch and rebase onto upstream, rebuild artifacts, and run checks/tests sequentially; run `interrogate` on high-risk concurrency/auth/protocol changes (only command-proven findings survive); trigger read-only `reviewer` whenever ≥2 source files or state-machine/permission/security/IPC/redaction paths change.
+4. **Stage 3 · Clean PR Delivery**: Follow repository templates and conventions (`yeet` / `github`), write `--body-file` in **BOM-free UTF-8**, match the repo's primary language, never add AI `Co-Authored-By` trailers or unsolicited review bots, and keep screenshots redacted and out of source branches.
+5. **Stage 4 · Post-Push CI & Review Loop**: Check `gh pr view --json mergeStateStatus` immediately (rebase if `DIRTY` so CI isn't skipped), monitor `gh pr checks` + `gh-fix-ci`, and close feedback via `gh-address-comments` by replying in-thread and running GraphQL `resolveReviewThread`, cleaning up branches with `--delete-branch` after merge.
 
 ---
 
 <details>
-<summary><b>Bundled skills and license reference</b></summary>
+<summary><b>Bundled 40 skills and license reference</b></summary>
 <br>
 
-All skills are located in the [`skills/`](./skills) directory. See [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md) for full attribution and license terms.
+All skills live under [`skills/`](./skills). See [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md) for full upstream attribution and license terms.
 
-| Category | Directory | Description | Source & License |
+| Category | Directory | Purpose | Source & License |
 | :--- | :--- | :--- | :--- |
-| **Architecture & Core Dev** | `rigorous-dev` | Core pipeline orchestrating branch analysis, two-strike resets, layout checks, and blind reviews | MIT (`Nous Research` / Extended in this repo) |
-| | `grill-me` | Asks developers targeted decision questions with recommendations before implementation | MIT (`mattpocock/skills`) |
-| | `improve-codebase-architecture` | Identifies shallow module abstractions and flags three common architectural code smells | MIT (`mattpocock/skills` + `cursor/pstack`) |
-| | `typescript-best-practices` | Discriminated unions, nominal types, Zod boundary validation, and exhaustive matching | MIT (`cursor/plugins/pstack`) |
-| | `blast-radius` | Evaluates cross-module blast radius and builds an evidence ladder for runtime assumptions | MIT (`cursor/plugins/pstack`) |
-| | `statechart` | Compiles TLA+ specifications into Mermaid statecharts and counterexample paths using SANY and TLC | MIT (`cursor/plugins/pstack`) |
-| | `benchmark-checklist` | 7-point verification checklist to prevent exaggerated performance claims | MIT (`cursor/plugins/pstack`) |
-| | `simplify-code` | Refines recent changes for reuse, clarity, and performance | MIT (`Nous Research`) |
-| | `subagent-driven-development` | Drives subagents with spec and code quality reviews before handoff | MIT (`obra/superpowers`) |
-| | `agent-merge-conflict-arbiter` | Resolves Git merge conflicts by reconciling commit intent and test results | MIT (`Nous Research`) |
-| **UI & Multiplatform** | `vercel-react-native-skills` | Guidelines for React Native and Expo list rendering, layouts, and native interactions | MIT (`vercel-labs/agent-skills`) |
-| | `animate-expo` | Reanimated motion guardrails, jank prevention during frequent updates, and UI thread gestures | MIT (`emilkowalski/skills`) |
-| | `break-ui` | Injects long German strings, extreme email lengths, and empty/full states for boundary testing | MIT (`emilkowalski/skills`) |
-| | `mobile-native` | Prevents mobile web `:hover` stickiness, viewport height bugs, and form zoom issues | MIT (`emilkowalski/skills`) |
-| | `write-swift` | Modern Swift value-type patterns and structured concurrency standards | MIT (`emilkowalski/skills`) |
-| | `emil-design-eng` | UI craftsmanship and transition timing guidelines from Emil Kowalski | MIT (`emilkowalski/skills`) |
-| | `impeccable` | Typography, contrast ratios, visual hierarchy, and anti-template styling rules | Apache-2.0 (`pbakaus/impeccable`) |
-| | `frontend-design` | Principles to avoid generic frontend styling and add tactile visual polish | Apache-2.0 (`anthropics/skills`) |
-| **Docs & Knowledge** | `humanizer` | Filters 34 common AI boilerplate habits and hollow phrasing patterns | MIT (`blader/humanizer`) |
-| | `llm-wiki` | Maintains an incremental local knowledge base using `raw/`, `concepts/`, and `index.md` | MIT (`Nous Research`) |
+| **Stage 0 · Grounding & Design** | `how` | Codebase walkthroughs producing an onboarding-grade mental model | MIT (Adapted) |
+| | `why` | Git/PR/issue archaeology separating proven facts from inference | MIT (Adapted) |
+| | `architect` | Sketch two distinct type/signature skeletons before implementing | MIT (Adapted) |
+| | `grill-me` | Frontier-round decision interview with recommended options | MIT (`rafaumeu` / `mattpocock` / Hermes) |
+| | `improve-codebase-architecture` | Flags shallow abstractions and three AI architecture red flags | MIT (`mattpocock/skills` + `cursor/pstack`) |
+| **Stage 1 · Build, Test & Guard** | `systematic-debugging` | 4-phase root-cause debugging with tight red/green loops | MIT (`obra/superpowers` / Hermes) |
+| | `spike` | Disposable feasibility prototypes before real implementation | MIT (`gsd-build/get-shit-done` / Hermes) |
+| | `test-value` | Evaluates test discrimination and feedback cost | MIT (`tt-a1i`) |
+| | `correct` | Eliminates repeat agent mistakes at highest leverage level | MIT (Adapted) |
+| | `simplify-codebase` | Evidence-backed removal of dead code and accidental complexity | MIT (`simplify-codebase contributors`) |
+| | `simplify-code` | Fast 3-pass cleanup for reuse, clarity, and performance | MIT (`Nous Research`) |
+| | `security-best-practices` | Language-specific security audit for Python / JS / TS / Go | Apache-2.0 (`OpenAI / Codex`) |
+| | `typescript-best-practices` | Discriminated unions, branded types, Zod boundary parsing | MIT (`cursor/plugins/pstack`) |
+| | `rigorous-dev` | Hermes monolithic workflow (two-strike reset, patch rules, 3-point gate) | MIT (`dreamfarer-space` & `Nous Research`) |
+| | `subagent-driven-development` | Subagent dispatch with spec and code quality reviews | MIT (`obra/superpowers`) |
+| | `agent-merge-conflict-arbiter` | Resolves Git conflicts using commit intent and test checks | MIT (`Nous Research`) |
+| | `codebase-inspection` | Inspects codebase LOC, languages, and ratios with `pygount` | MIT (`Nous Research`) |
+| | `localization` | Locale catalog translation, review, and Android/iOS resource checks | MIT (`Nous Research`, sanitized) |
+| | `node-inspect-debugger` | Debugs Node.js processes via `--inspect` and CDP CLI | MIT (`Nous Research`) |
+| | `python-debugpy` | Debugs Python via `pdb` REPL and `debugpy` DAP | MIT (`Nous Research`) |
+| **Stage 2 · Proof & Verification** | `interrogate` | Adversarial probers break changes; only executed repros survive | MIT (Adapted) |
+| | `blast-radius` | Cross-module blast radius audit and 5-level evidence ladder | MIT (`cursor/plugins/pstack`) |
+| | `statechart` | Compiles TLA+ specs into Mermaid statecharts and counterexamples | MIT (`cursor/plugins/pstack`) |
+| | `benchmark-checklist` | 7-point gate against unverified performance claims | MIT (`cursor/plugins/pstack`) |
+| **Stage 3 & 4 · PR & CI Loop** | `yeet` | Stage, commit, push, and open/update GitHub PRs cleanly | Apache-2.0 (`OpenAI / Codex`, sanitized) |
+| | `github` | `gh` CLI hub for issues, reviews, repos, auth, and releases | MIT (`Nous Research`, sanitized) |
+| | `gh-fix-ci` | Inspects failing GitHub Actions checks and builds fix plans | Apache-2.0 (`OpenAI / Codex`) |
+| | `gh-address-comments` | Replies to PR threads and resolves them via GraphQL | Apache-2.0 (`OpenAI / Codex`) |
+| | `github-pr-assessment` | Evaluates PR changes, check status, and merge likelihood | MIT (`Nous Research`) |
+| **UI & Multiplatform** | `vercel-react-native-skills` | React Native / Expo rendering, layout, and native patterns | MIT (`vercel-labs/agent-skills`) |
+| | `animate-expo` | Reanimated motion guardrails and UI-thread gestures | MIT (`emilkowalski/skills`) |
+| | `break-ui` | Stress-tests UI layouts with worst-case strings and list bounds | MIT (`emilkowalski/skills`) |
+| | `mobile-native` | Fixes mobile web `:hover` stickiness, `100dvh`, and input zoom | MIT (`emilkowalski/skills`) |
+| | `write-swift` | Modern Swift value-type and structured concurrency patterns | MIT (`emilkowalski/skills`) |
+| | `emil-design-eng` | UI polish, transition timing, and interaction craftsmanship | MIT (`emilkowalski/skills`) |
+| | `impeccable` | Typography, contrast, hierarchy, and anti-template guidance | Apache-2.0 (`pbakaus/impeccable`) |
+| | `frontend-design` | Practical layout, visual texture, and frontend craftsmanship | Apache-2.0 (`anthropics/skills`) |
+| | `gemini-frontend-design` | Polished web UI design across layout, color, typography, motion | Apache-2.0 (`Google Gemini`) |
+| **Docs & Knowledge** | `humanizer` | Strips 34 common AI writing patterns and filler phrases | MIT (`blader/humanizer`, sanitized) |
+| | `llm-wiki` | Maintains incremental knowledge bases (`raw/`, `concepts/`, `index.md`) | MIT (`Nous Research`) |
 
 </details>
 
@@ -172,24 +164,34 @@ All skills are located in the [`skills/`](./skills) directory. See [`THIRD_PARTY
 ├── README.md                          # Chinese documentation
 ├── README.en.md                       # English documentation
 ├── LICENSE                            # Repository MIT license
-├── THIRD_PARTY_NOTICES.md             # Upstream copyright and license notices for all 20 skills
+├── THIRD_PARTY_NOTICES.md             # Upstream notices for all 40 skills
 ├── assets/
 │   ├── hero.svg                       # Header graphic
-│   ├── model-routing.svg              # Model roles and routing topology
-│   └── pipeline.svg                   # Five-step verification workflow diagram
+│   ├── model-routing.svg              # Model roles and permission isolation diagram
+│   └── pipeline.svg                   # Five-stage hard-gated pipeline diagram
+├── plugins/
+│   └── workflow/                      # Sanitized Antigravity native plugin bundle
+│       ├── plugin.json
+│       ├── README.md
+│       ├── agents/
+│       │   ├── reviewer.md            # Strictly read-only 4-dimension auditor
+│       │   └── scout.md               # Read-only + CLI investigator (no write tools)
+│       └── rules/
+│           └── AGENTS.md              # 5-stage hard-gated workflow rules template
 ├── configs/
-│   └── hermes-config.example.yaml     # Hermes routing groups and anti-loop configuration template
+│   ├── AGENTS.example.md              # Pi / Claude Code / Magpie rules template
+│   └── hermes-config.example.yaml     # Hermes routing & guardrail configuration template
 ├── scripts/
-│   ├── install-skills.sh              # Skill installation script (Hermes / Claude / Cursor / .agents)
-│   └── setup-magpie-groups.sh         # Magpie routing group configuration script
-├── skills/                            # 20 bundled engineering skills
+│   ├── install-skills.sh              # Installer (Antigravity / Hermes / Claude / Cursor / .agents)
+│   └── setup-magpie-groups.sh         # Magpie routing group setup script
+├── skills/                            # 40 bundled engineering skills
 │   ├── autonomous-ai-agents/
 │   ├── creative/
 │   ├── research/
 │   └── software-development/
 └── docs/
-    ├── benchmarks-2026-11.md          # Benchmark numbers and verification notes for major models
-    └── power-user-patterns.md         # In-depth breakdown of engineering patterns and acceptance criteria
+    ├── benchmarks-2026-11.md          # Measured benchmarks & dual-stack model selection
+    └── power-user-patterns.md         # In-depth breakdown of Stage 0–4 engineering gates
 ```
 
 </details>
@@ -198,4 +200,4 @@ All skills are located in the [`skills/`](./skills) directory. See [`THIRD_PARTY
 
 ## License
 
-New configurations, diagrams, and documentation in this repository are released under the [MIT License](./LICENSE). Bundled third-party projects inside `skills/` remain under their original **MIT** or **Apache 2.0** licenses. See individual skill directories and the root [Third-Party Notices](./THIRD_PARTY_NOTICES.md) for details.
+New configurations, plugin templates, diagrams, and documentation in this repository are released under the [MIT License](./LICENSE). Bundled third-party projects inside `skills/` remain under their original **MIT** or **Apache 2.0** licenses. See individual skill directories and the root [Third-Party Notices](./THIRD_PARTY_NOTICES.md) for details.

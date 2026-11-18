@@ -10,7 +10,6 @@ metadata:
     tags: [writing, editing, humanize, anti-ai-slop, voice, prose, text]
     category: creative
     homepage: https://github.com/blader/humanizer
-    related_skills: [songwriting-and-ai-music]
 ---
 
 # Humanizer: Remove AI Writing Patterns
@@ -34,10 +33,20 @@ Also apply this skill to **your own** output when writing user-facing prose such
 
 The text usually arrives one of three ways:
 1. **Inline.** The user pastes the text into the message. Work on it in place and reply with the rewrite.
-2. **File.** The user points at a file. Use `read_file` to load it, then `patch` or `write_file` to apply edits. For a markdown doc in a repo, a targeted `patch` per section is cleaner than rewriting the whole file.
+2. **File.** The user points at a file. Use `read` to load it, then `edit` or `write` to apply edits. For a markdown doc in a repo, a targeted `edit` per section is cleaner than rewriting the whole file.
 3. **Voice calibration sample.** The user provides a sample of their own writing (inline or by file path) and asks you to match it. Read the sample first, then rewrite. See the Voice Calibration section below.
 
-Always show the rewrite to the user. For file edits, show a diff or the changed section instead of silently overwriting.
+For inline text, return the final rewrite. For repository file edits, apply the changes and link the finished file with a short account of what changed; show drafts or a diff only when requested. Keep the anti-AI audit internal unless the user asks for editorial reasoning.
+
+## Public README editing
+
+1. Read the existing README, actual installer/configuration examples, and linked sources before rewriting; retain exact commands and identifiers only after checking they match the artifacts.
+2. Lead with what the repository does and the shortest verified path to using it. Keep model routing optional when the skills can be installed independently, and state prerequisites beside the relevant commands.
+3. Use conversational Chinese for this user's Chinese README and keep the English version aligned on capabilities, setup, and limitations. Prefer concrete usage examples over promotional labels such as “production-grade,” “one-minute setup,” or “works out of the box” without supporting execution. If the user says the result still sounds AI-written, rewrite the paragraph structure and vocabulary instead of reporting that the checklist was applied; remove inflated engineering slogans, forced metaphors, and repetitive bold labels. This user prefers Gemini 3.8 Flash for README copy and localization: when requested, pin the writing stage through a verified model route and hand it the actual draft and factual constraints; prompt instructions alone do not select a model.
+   For requests to make a README attractive, improve the rendered page as well as the prose: establish a clear opening, readable spacing, restrained badges, useful diagrams or a hero image, and collapsible secondary detail. Inspect the rendered Markdown at wide and narrow widths, check image legibility and links, and keep the quickest usable example near the top. Visual polish should make verified benefits easier to grasp rather than add promotional claims.
+4. Preserve factual provenance while adding voice. Never invent first-person experiences, quotations, test results, benchmark scores, or author endorsements to make prose sound human. Use personal anecdotes only when the user supplied or confirmed them; otherwise describe the practical problem without claiming it happened to the author. Treat worked examples in this skill as style demonstrations, not factual sources.
+5. Separate measured results, cited external claims, and personal routing preferences. Do not turn a gateway model alias or an earlier assistant assertion into a verified public benchmark; omit unsupported rankings and numbers or explicitly label their uncertainty.
+6. Check README links and diagrams against the final repository layout. Report the deliverable and actual verification briefly; avoid replaying the full editing process.
 
 ## Your task
 
@@ -564,15 +573,11 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 7. Answer briefly with the remaining tells (if any).
 8. Prompt yourself: "Now make it not obviously AI generated."
 9. Present the final version (revised after the audit).
-10. If the text came from a file, apply the edit with `patch` (targeted) or `write_file` (full rewrite) and show the user what changed.
+10. If the text came from a file, apply the edit with `edit` (targeted) or `write` (full rewrite) and show the user what changed.
 
 ## Output Format
 
-Provide:
-1. Draft rewrite
-2. "What makes the below so obviously AI generated?" (brief bullets)
-3. Final rewrite
-4. A brief summary of changes made (optional, if helpful)
+Return one final rewrite for inline requests. For edited files, return the artifact link and a concise summary of substantive changes and verification. Provide intermediate drafts and the anti-AI audit only if requested; the Process section's draft/audit/revision steps are internal editing passes by default.
 
 
 ## Full Example
@@ -642,6 +647,6 @@ Provide:
 
 This skill is ported from [blader/humanizer](https://github.com/blader/humanizer) (MIT licensed), which is itself based on [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing), maintained by WikiProject AI Cleanup. The patterns documented there come from observations of thousands of instances of AI-generated text on Wikipedia.
 
-Original author: Siqi Chen ([@blader](https://github.com/blader)). Original repo: https://github.com/blader/humanizer (version 2.5.1). Ported to Hermes Agent with Hermes-native tool references (`read_file`, `patch`, `write_file`) and guidance for when to load the skill. The original 29 patterns come from the source, and the before/after examples (including the full worked example) are kept as demonstrations. Patterns 30-34 and the "marketing and blog clichés" list added to pattern 7 are Hermes additions and are not part of the upstream source. The skill's own instructional prose has also been lightly edited to follow its own guidance (for example, removing em dashes and negative parallelism from the narration) so the skill models the writing it asks for. Original MIT license preserved in the `LICENSE` file alongside this `SKILL.md`.
+Original author: Siqi Chen ([@blader](https://github.com/blader)). Original repo: https://github.com/blader/humanizer (version 2.5.1). Adapted with local agent file tool references (`read`, `edit`, `write`) and guidance for when to load the skill. The original 29 patterns come from the source, and the before/after examples (including the full worked example) are kept as demonstrations. Patterns 30-34 and the "marketing and blog clichés" list added to pattern 7 are additions and are not part of the upstream source. The skill's own instructional prose has also been lightly edited to follow its own guidance (for example, removing em dashes and negative parallelism from the narration) so the skill models the writing it asks for. Original MIT license preserved in the `LICENSE` file alongside this `SKILL.md`.
 
 Key insight from Wikipedia: "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."

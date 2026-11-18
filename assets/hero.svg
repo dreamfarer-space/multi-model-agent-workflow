@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 250" role="img" aria-labelledby="hero-title hero-desc">
-  <title id="hero-title">Multi-Model Agent Workflow — Hermes x Magpie</title>
-  <desc id="hero-desc">Hero banner for Multi-Model Agent Workflow: Quota-isolated model routing and 20 ready-to-use engineering skills for Hermes Agent, Claude Code, and Cursor.</desc>
+  <title id="hero-title">Multi-Model Agent Workflow — Antigravity · Hermes · Magpie</title>
+  <desc id="hero-desc">Hero banner for Multi-Model Agent Workflow: Quota-isolated model routing, 5-stage gated PR pipeline, and 40 ready-to-use engineering skills for Antigravity, Hermes Agent, Claude Code, and Pi.</desc>
   <defs>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#090d16"/>
@@ -22,33 +22,33 @@
   <rect x="1" y="1" width="958" height="248" rx="15" fill="none" stroke="#334155" stroke-width="1.5"/>
 
   <!-- Top eyebrow pill -->
-  <rect x="48" y="34" width="276" height="26" rx="13" fill="#1e293b" stroke="#3b82f6" stroke-width="1"/>
+  <rect x="48" y="34" width="372" height="26" rx="13" fill="#1e293b" stroke="#3b82f6" stroke-width="1"/>
   <circle cx="64" cy="47" r="4" fill="#34d399"/>
-  <text x="76" y="51" font-family="SFMono-Regular, Consolas, Menlo, monospace" font-size="11.5" font-weight="600" fill="#e2e8f0">HERMES AGENT · CLAUDE CODE · CURSOR</text>
+  <text x="76" y="51" font-family="SFMono-Regular, Consolas, Menlo, monospace" font-size="11.5" font-weight="600" fill="#e2e8f0">ANTIGRAVITY · HERMES · CLAUDE CODE · PI</text>
 
   <!-- Main Title -->
   <text x="48" y="104" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif" font-size="34" font-weight="800" fill="#f8fafc" letter-spacing="-0.5">Multi-Model Agent Workflow</text>
   <rect x="48" y="118" width="180" height="3.5" rx="2" fill="url(#accentGrad)"/>
 
   <!-- Subtitle -->
-  <text x="48" y="150" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif" font-size="15.5" font-weight="400" fill="#cbd5e1">把不同模型的额度池和脾气拆开用：1 个主脑拍板改核心代码、3 路快模型轮询探路、异血统模型只看 diff 盲审。</text>
-  <text x="48" y="174" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif" font-size="14" font-weight="400" fill="#94a3b8">内置 20 个开箱即用的开源 Skill（TLA+ 状态图编译、爆破半径验证、UI 脏数据压测、TS 类型防呆）。</text>
+  <text x="48" y="150" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif" font-size="15.5" font-weight="400" fill="#cbd5e1">五阶段硬门禁工程流：Hydrogen 主脑统筹、只读 Scout/Research 勘察、Carbon / Sol 盲审、Opus 急救。</text>
+  <text x="48" y="174" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif" font-size="14" font-weight="400" fill="#94a3b8">内置 40 个工程 Skill + 原生 Antigravity 插件包（how/why/architect/correct/interrogate/test-value）。</text>
 
   <!-- Bottom Model Pills -->
   <g transform="translate(48, 196)">
-    <rect x="0" y="0" width="168" height="28" rx="6" fill="#172554" stroke="#3b82f6" stroke-width="1.2"/>
-    <text x="12" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#93c5fd">Lead: Gemini 4 Argon</text>
+    <rect x="0" y="0" width="188" height="28" rx="6" fill="#172554" stroke="#3b82f6" stroke-width="1.2"/>
+    <text x="12" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#93c5fd">Lead: Gemini 4 Hydrogen</text>
 
-    <rect x="180" y="0" width="186" height="28" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1.2"/>
-    <text x="192" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#6ee7b7">Swarm: DeepSeek V4.1</text>
+    <rect x="198" y="0" width="180" height="28" rx="6" fill="#451a03" stroke="#f59e0b" stroke-width="1.2"/>
+    <text x="210" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#fcd34d">Audit: Gemini 4 Carbon</text>
 
-    <rect x="378" y="0" width="182" height="28" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1.2"/>
-    <text x="390" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#6ee7b7">256K: MiniMax M3.1</text>
+    <rect x="388" y="0" width="186" height="28" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1.2"/>
+    <text x="400" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#6ee7b7">Swarm: 3-Family / Self</text>
 
-    <rect x="572" y="0" width="166" height="28" rx="6" fill="#1e293b" stroke="#64748b" stroke-width="1.2"/>
-    <text x="584" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#e2e8f0">i18n: Gemini 3.8</text>
+    <rect x="584" y="0" width="144" height="28" rx="6" fill="#1e293b" stroke="#64748b" stroke-width="1.2"/>
+    <text x="596" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#e2e8f0">Audit2: GPT-6.1 Sol</text>
 
-    <rect x="750" y="0" width="162" height="28" rx="6" fill="#451a03" stroke="#f59e0b" stroke-width="1.2"/>
-    <text x="762" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#fcd34d">Audit: GPT-6.1 Sol</text>
+    <rect x="738" y="0" width="126" height="28" rx="6" fill="#31102f" stroke="#c084fc" stroke-width="1.2"/>
+    <text x="750" y="18" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#e9d5ff">Rescue: Opus 5.5</text>
   </g>
 </svg>

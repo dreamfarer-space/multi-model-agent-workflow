@@ -91,7 +91,7 @@ Only after orientation should you ingest, query, or lint. This prevents:
 - Contradicting the schema's conventions
 - Repeating work already logged
 
-For large wikis (100+ pages), also run a quick `search_files` for the topic
+For large wikis (100+ pages), also run a quick `grep` for the topic
 at hand before creating anything new.
 
 ## Initializing a New Wiki
@@ -271,7 +271,7 @@ When the user provides a source (URL, file, paste), integrate it into the wiki:
 ② **Discuss takeaways** with the user — what's interesting, what matters for
    the domain. (Skip this in automated/cron contexts — proceed directly.)
 
-③ **Check what already exists** — search index.md and use `search_files` to find
+③ **Check what already exists** — search index.md and use `grep` to find
    existing pages for mentioned entities/concepts. This is the difference between
    a growing wiki and a pile of duplicates.
 
@@ -305,7 +305,7 @@ and desired — it's the compounding effect.
 When the user asks a question about the wiki's domain:
 
 ① **Read `index.md`** to identify relevant pages.
-② **For wikis with 100+ pages**, also `search_files` across all `.md` files
+② **For wikis with 100+ pages**, also `grep` across all `.md` files
    for key terms — the index alone may miss relevant content.
 ③ **Read the relevant pages** using `read_file`.
 ④ **Synthesize an answer** from the compiled knowledge. Cite the wiki pages
@@ -369,18 +369,18 @@ wiki = "<WIKI_PATH>"
 
 ### Searching
 
-```bash
+```text
 # Find pages by content
-search_files "transformer" path="$WIKI" file_glob="*.md"
+grep(pattern="transformer", path="$WIKI", glob="*.md")
 
 # Find pages by filename
-search_files "*.md" target="files" path="$WIKI"
+find(pattern="*.md", path="$WIKI")
 
 # Find pages by tag
-search_files "tags:.*alignment" path="$WIKI" file_glob="*.md"
+grep(pattern="tags:.*alignment", path="$WIKI", glob="*.md")
 
 # Recent activity
-read_file "$WIKI/log.md" offset=<last 20 lines>
+read("$WIKI/log.md", offset=<last 20 lines>)
 ```
 
 ### Bulk Ingest

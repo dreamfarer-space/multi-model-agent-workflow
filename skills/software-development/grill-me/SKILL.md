@@ -8,7 +8,7 @@ platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [planning, adversarial, interview, decision-tree, pre-implementation, review, alignment]
-    related_skills: [requesting-code-review, subagent-driven-development, test-driven-development]
+    related_skills: [test-value, simplify-codebase, security-best-practices]
 ---
 
 # Grill Me
@@ -26,9 +26,9 @@ mechanic from mattpocock/skills' `grilling`.
 - User says "grill me", "interview my plan", "stress test this idea"
 - Before complex work: auth flows, schema changes, migrations, payments
 - A plan has unresolved decisions or seems vague
-- Before `subagent-driven-development` decomposition
+- Before breaking complex work into `invoke_subagent` / `run_workflow` tasks
 
-Do NOT use for existing code (use `requesting-code-review`) or simple one-off
+Do NOT use for existing code (use `invoke_subagent(TypeName="reviewer", ...)` / `simplify-codebase`) or simple one-off
 tasks.
 
 ## Prerequisites
@@ -62,8 +62,8 @@ round.
 
 **Facts are your job; decisions are the user's.** When a frontier question
 needs a fact from the environment (codebase, filesystem, config, docs), find
-it yourself with `search_files` / `read_file` / `terminal` — or dispatch a
-subagent via `delegate_task` for a heavy exploration. Never ask the user for
+it yourself with `read_file` / `run_command` — or dispatch
+`invoke_subagent` (`TypeName="research"` or `"scout"`) for a heavy exploration. Never ask the user for
 anything you could look up. Don't block on an exploration: only the questions
 downstream of it wait; ask the rest of the frontier now.
 
@@ -96,8 +96,8 @@ Do not act on the plan until the user confirms shared understanding.
 1. **Asking questions out of dependency order.** A question that depends on
    an unanswered question is a guess wearing a question mark. Keep it for a
    later round.
-2. **Skipping the codebase.** Find facts in code with Hermes tools instead of
-   asking the user.
+2. **Skipping the codebase.** Find facts in code with Antigravity tools (`read_file`, `run_command`) instead of
+   asking the user. Use `/grill-me` or `ask_question` when structured choice rounds fit.
 3. **Accepting "I don't know" as final.** Suggest options, explain
    trade-offs, make a recommendation.
 4. **Writing code during the interrogation.** Alignment only — code after the

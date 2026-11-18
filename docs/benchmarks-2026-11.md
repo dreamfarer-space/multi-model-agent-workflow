@@ -36,3 +36,13 @@
    - 在 `DeepSWE v1.1` 上拿到 75.2%（反超旗舰 Astra 的 74.1%），`MultiChallenge` 多轮指令遵循 82.0% 榜首，且不会像 Astra 那样把 3 个测试自作主张扩写成 15 个。与 Gemini / DeepSeek 跨家族搭配做两阶段盲审，互补效果最佳。
 4. **`DeepSeek-V4.1-Flash` + `MiniMax-M3.1-Flash` + `Gemini-3.8-Flash` 组成“三族快马轮询池”**：
    - 速度全部在 **130 ~ 210 tok/s** 区间，通过 Magpie 的 `routing=rotate, stays=turn` 分流，4 路并发子智能体可在 3 分钟内完成全仓库只读审计，且兼具 DeepSeek 的代码逻辑、MiniMax 的 256K 长程检索（LOCA-Bench 60.3% 第 1）与 Gemini 的多语言/前端敏感度。
+
+---
+
+## 三、最新双栈分工演进（Antigravity 2.0 / Pi / Magpie）
+
+除了上表对应的 **Hermes × Magpie 三族轮询 + Sol 盲审** 配置，日常高强度工程现已进一步收敛出面向 **Antigravity 原生插件 / Pi / Claude Code** 的双栈分工方案：
+
+- **主脑与常规子智能体统一走 `Gemini 4 Hydrogen (High)`**（`gemini-4-hydrogen-high` / `antigravity/gemini-4-hydrogen`）：同时承担需求收敛、两版架构骨架设计（`architect`）、核心耦合修改，以及只读 `research` / `scout` 和独立 `self` / `worker` 施工，减少跨模型上下文切换损耗，首字与工具执行节奏更紧凑。
+- **推前独立终审切至 `Gemini 4 Carbon (High)`**（`gemini-4-carbon-high` / `antigravity/gemini-4-carbon`）：通过只读 `reviewer`（或 Hermes 下的 `GPT-6.1-Sol`）在无聊天上下文前提下执行 4 维审查（边界私货、安全脱敏与竞态、`test-value` 鉴别力、废话注释与抑制标记），严防主执行模型确认偏误。
+- **死锁急救依然锁定 `Claude Opus 5.5`（`high`/`medium`）**：严禁常驻主窗口跑长链路，仅在两轮修复仍失败时做单回合根因排查。

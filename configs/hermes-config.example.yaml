@@ -92,6 +92,14 @@ auxiliary:
 # Quick-Switch Model Aliases (`/model <alias>`)
 # -----------------------------------------------------------------------------
 model_aliases:
+  hydrogen:
+    model: antigravity/gemini-4-hydrogen
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
+  carbon:
+    model: antigravity/gemini-4-carbon
+    provider: magpie
+    base_url: http://127.0.0.1:3425/v1
   argon:
     model: antigravity/gemini-4-argon
     provider: magpie

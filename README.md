@@ -3,54 +3,59 @@
 <img src="./assets/hero.svg" alt="Multi-Model Agent Workflow" width="100%">
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](./LICENSE)
-[![Bundled Skills](https://img.shields.io/badge/Skills-20%20Bundled-success.svg?style=flat-square)](./skills)
-[![Works with](https://img.shields.io/badge/Works%20with-Hermes%20%7C%20Claude%20Code%20%7C%20Cursor-orange.svg?style=flat-square)](#最快上手)
+[![Bundled Skills](https://img.shields.io/badge/Skills-40%20Bundled-success.svg?style=flat-square)](./skills)
+[![Works with](https://img.shields.io/badge/Works%20with-Antigravity%20%7C%20Hermes%20%7C%20Claude%20Code%20%7C%20Pi-orange.svg?style=flat-square)](#最快上手)
 [![Language](https://img.shields.io/badge/Language-English%20%7C%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-lightgrey.svg?style=flat-square)](./README.en.md)
 
-<p>一套按照真实工程痛点搭出来的多模型协作流，外加开箱即用的 20 个高频工程技能。</p>
+<p>一套在真实全栈项目里打磨出来的多模型工程工作流，内置原生 Antigravity 插件包、跨工具规则模板与 40 个开箱即用的工程技能。</p>
 
-[English](./README.en.md) · **简体中文** · [实测基准](./docs/benchmarks-2026-11.md) · [工程模式拆解](./docs/power-user-patterns.md)
+[English](./README.en.md) · **简体中文** · [实测基准](./docs/benchmarks-2026-11.md) · [五阶段模式拆解](./docs/power-user-patterns.md)
 
 </div>
 
 ---
 
-在vibe coding 过程中，我常被两件事搞崩：
+写复杂项目时，AI Agent 最容易在三件事上翻车：
 
-一是**额度烧得快，速度还很慢**。拿推理成本极高的主力模型去跑全局 `grep`，或者把所有子任务塞给同一个免费慢模型排队。结果主会话额度撑不过半天，子任务通道全堵死。
+一是**主脑乱翻大文件烧光额度，后台任务却没做好隔离**。主窗口一边读几千行日志一边改核心代码，并发子任务又往同一个目录写文件，最后冲突到只能整体回滚。
 
-二是**并发写代码搞出分支灾难**。让好几个子智能体同时碰互相依赖的前端组件、状态流和多语言字典，半小时后代码冲突到连测试都跑不起来，只能全盘回滚。
+二是**自改自审的确认偏误**。同一个模型、同一段聊天上下文，写完代码再自己点通过，往往看不到漏做的边界、私货改动或测试里的假断言。
 
-这套配置的核心思路很朴素：
-1. **主窗口只留给大模型做架构判断与核心改动**，看图查 UI、推导复杂状态机最准。
-2. **读仓库和跑腿交给三个不同厂商的快模型轮询**，并发查资料不撞单账号限频。
-3. **审代码换另一个血统的模型只读 diff 盲审**，谁写的谁别审，一眼看出计划外夹带的私货。
+三是**全靠提示词口头约束，一上压力就忘**。只写在文档里的规矩迟早被跳过，必须靠**架构隔离、工具权限物理剥离、五阶段硬卡点与静态检查**兜底。
+
+这套工作流只解决这三件事：
+1. **权限与角色硬隔离**：主脑（`Gemini 4 Hydrogen (High)` 或 Hermes `Argon`）只负责架构定稿与强耦合核心；`scout` / `research` 物理剥离写工具，只读勘察附 `file:line`；独立模块施工走隔离 Worktree 或 `group/work` 三族轮询（≤5 并发）。
+2. **五阶段硬门禁闭环（Stage 0 – Stage 4）**：先 `how` + `why` + `architect` 定界，再 `systematic-debugging` + `test-value` + `correct` 施工，推前必须过 `interrogate` 实证对抗与只读 `reviewer`（`Gemini 4 Carbon (High)` 或 `GPT-6.1-Sol`）四维盲审，推后跟进 `DIRTY` 检查与 `resolveReviewThread`。
+3. **跨平台开箱即用**：同一套 Skill 库（40 个）和规则模板，可直接装入 **Google Antigravity**、**Hermes Agent**、**Pi / Claude Code** 与 **Cursor**。
 
 <div align="center">
-  <img src="./assets/model-routing.svg" alt="多模型路由与配额隔离架构" width="100%">
+  <img src="./assets/model-routing.svg" alt="多模型路由与权限隔离架构" width="100%">
 </div>
 
 ---
 
 ## 最快上手
 
-仓库里的 `skills/` 已经内置了整理完毕的 20 个工程技能，保留全部上游许可证，克隆后跑一行脚本就能装好。
+仓库已经内置脱敏后的 Antigravity 插件包（`plugins/workflow/`）、通用 `AGENTS.md` 模板（`configs/AGENTS.example.md`）、Hermes + Magpie 模板以及 **40 个工程技能**（保留全部上游许可证）。
 
 ```bash
 git clone https://github.com/dreamfarer-space/multi-model-agent-workflow.git
 cd multi-model-agent-workflow
 
-# 1. 安装 20 个技能（支持 hermes / claude / cursor / agents）
-bash scripts/install-skills.sh --target hermes
+# 1. 安装到目标环境（支持 antigravity / hermes / claude / cursor / agents）
+bash scripts/install-skills.sh --target antigravity
+# 或安装到 Hermes / Claude Code / Cursor / ~/.agents:
+# bash scripts/install-skills.sh --target hermes
 
-# 2. 如果用 Magpie 聚合网关，跑脚本建好路由分组
+# 2. （可选）如果使用 Magpie 聚合网关，创建路由分组
 bash scripts/setup-magpie-groups.sh
 ```
 
-如果你用 Hermes Agent，把以下配置写入环境即可跑起来（完整模板见 `configs/hermes-config.example.yaml`）：
+- **Pi / Claude Code 用户**：将 [`configs/AGENTS.example.md`](./configs/AGENTS.example.md) 复制为 `~/.pi/agent/AGENTS.md` 或 `~/.claude/CLAUDE.md`，把模型指向本地 Magpie 网关（`antigravity/gemini-4-hydrogen` 主脑与子任务 + `antigravity/gemini-4-carbon` 独立审查 + `antigravity/claude-opus-5-5` 死锁急救）。
+- **Hermes Agent 用户**：完整配置模板见 [`configs/hermes-config.example.yaml`](./configs/hermes-config.example.yaml)，常用项可直接通过 CLI 写入：
 
 ```bash
-hermes config set model.default antigravity/gemini-4-argon
+hermes config set model.default antigravity/gemini-4-hydrogen
 hermes config set delegation.model group/work
 hermes config set delegation.max_concurrent_children 5
 hermes config set delegation.independent_completions true
@@ -60,102 +65,90 @@ hermes config set delegation.max_summary_chars 8000
 hermes config set terminal.timeout 600
 hermes config set tool_loop_guardrails.hard_stop_enabled true
 hermes config set auxiliary.compression.model minimax-code/MiniMax-M3.1-Flash
-hermes config set auxiliary.review.model codex/gpt-6.1-sol
+hermes config set auxiliary.review.model antigravity/gemini-4-carbon
 hermes config set auxiliary.background_review.model codex/gpt-6.1-sol
 hermes config set auxiliary.background_review.reasoning_effort high
 ```
 
 ---
 
-## 岗位模型怎么挑
+## 模型角色与两种主流路由
 
-写代码时不同模型的脾气差别很大，详细数据点与第三方推算方法见 [基准测试汇总文档](./docs/benchmarks-2026-11.md)。日常开发各司其职即可，没必要让旗舰模型干杂活：
-
-| 角色 | 路由 / 配置项 | 公开测试基准 | 为什么选它 |
+| 角色 | Antigravity / Pi（双栈主力） | Hermes × Magpie（多族配额隔离） | 职责与核心约束 |
 | :--- | :--- | :--- | :--- |
-| **主窗口逻辑决策** | `antigravity/gemini-4-argon`<br>`model.default` | DeepSWE v1.1 `77.9%`<br>GraphWalks 128K `99.7%`<br>Roboflow 视觉 `87.5%` | 跨文件调用链追踪、查 UI 截图对齐极稳。首字思考通常要等十几秒，所以别派它去遍历文件，只让它做方案抉择和改动核心耦合代码。走 Google AI Ultra 池（5 小时重置周期）。 |
-| **子任务侦察轮询** | `group/work`<br>`routing=rotate, stays=turn` | DeepSeek-V4.1-Flash (`190 tok/s`)<br>MiniMax-M3.1-Flash (`166 tok/s`)<br>Gemini-3.8-Flash (`130 tok/s`) | 派出去查资料的子任务，按轮询摊到腾讯、MiniMax 和 Google Pro 三家，谁也不卡谁。`stays=turn` 能让单个子任务在多轮工具调用时不乱跳模型。另外挂了 `workbuddy/hy4free` 兜底。 |
-| **多语言与文案生成** | `antigravity/gemini-3.8-flash`<br>`group/edit` | LMArena 中文视觉第 1<br>LiveCodeBench `89.5%` | 锁在 Google AI Pro 账号池，省下 Ultra 额度。专门负责一次性对齐多语言字典（`locales/*.ts`）和整理发版说明，单次吞吐快。 |
-| **长上下文压缩** | `minimax-code/MiniMax-M3.1-Flash`<br>`auxiliary.compression` | LOCA-Bench 256K `60.3%`（长程检索第一）<br>最大单次输出 `524K` | 会话过长触发自动压缩时切过来，长记忆保留能力强，不会把前面已经排查过的 `file:line` 和证伪结论弄丢。 |
-| **盲审查漏 & 救场** | 盲审：`codex/gpt-6.1-sol:high`<br>救场：`claude-opus-5-5` | Sol：DeepSWE `75.2%`、指令遵循 `82.0%`<br>Opus 5.5：SWE-bench Pro `89.9%` | 主窗口写代码，提交前换 OpenAI 血统的 Sol 专门挑刺。Opus 5.5 额度珍贵，不挂主窗口跑长任务，只在主模型连改两轮依然卡死时切过去单回合定位根因。 |
+| **主脑决策与耦合核心** | `Gemini 4 Hydrogen (High)` | `antigravity/gemini-4-argon` | 需求收敛、`architect` 两版骨架、强耦合代码改动、最终验收；主会话禁止连续超过 30 次独自读写文件。 |
+| **只读侦察（静态 / CLI）** | `research`（纯静态沙盒）<br>`scout`（无写工具 + CLI） | `group/work`（`DeepSeek-V4.1` / `MiniMax-M3.1` / `Gemini-3.8-Flash`） | 查调用链（`how`）、git/PR 考古（`why`）、最小复现；单次限制 **≤25 次调用、≤8 文件、≤50 行附 `file:line`**。 |
+| **独立施工与并行验证** | `self`（`share` / `branch` 隔离）<br>`run_workflow`（Python 编排） | `group/work`（`rotate, stays=turn`）+ `worktree_isolation` | 独立模块、回归测试、多语言对齐（单批 **≤5 并发**，同一文件禁同回合多次局部 patch）。 |
+| **推前独立盲审** | `Gemini 4 Carbon (High)`<br>（`plugins/workflow/agents/reviewer.md`） | `codex/gpt-6.1-sol:high`<br>（`auxiliary.review`） | **不传聊天历史**，只给需求边界 + `git diff` + 测试输出，严格核查 4 维门禁；未 `PASS` 不得 push。 |
+| **长上下文压缩与急救** | 急救：`claude-opus-5-5` | 压缩：`MiniMax-M3.1-Flash`<br>急救：`claude-opus-5-5` | 连续两轮修复失败立刻停手重置或切 `Opus 5.5` 单回合排查；压缩交给长程检索榜首 `MiniMax`。 |
+
+详细基准数据与选型依据见 [2026-11 基准汇总](./docs/benchmarks-2026-11.md)。
 
 ---
 
-## 日常工程流水线
+## 五阶段硬门禁工程流（Stage 0 – Stage 4）
 
 <div align="center">
-  <img src="./assets/pipeline.svg" alt="五步工程验证流程" width="100%">
+  <img src="./assets/pipeline.svg" alt="五阶段硬门禁工程流水线" width="100%">
 </div>
 
-这套流程综合了 Boris Cherny、Jesse Vincent (`superpowers`)、Garry Tan (`gstack`)、Matt Pocock (`grill-me`)、Emil Kowalski 和 Lauren Tan (`cursor/pstack`) 的实战经验，更深层次的设计背景写在 [高阶用法解析](./docs/power-user-patterns.md)。
+这套流程把“靠自觉”变成五个按序卡死的工程节点，细节拆解见 [五阶段工程模式解析](./docs/power-user-patterns.md)：
 
-### 1. 先定边界，问清分支再写代码
-
-主窗口绝不自己翻大文件，也不在根会话里单枪匹马连跑超过 30 次 `read_file`/`patch`。先派 3 到 5 个只读子任务去侦察，硬性限制每个子任务**最多调用 25 次工具、最多查 8 个目标文件、返回摘要不超过 50 行（必须附带明确的 `file:line` 坐标）**，查清职责内事实即刻返回，拒绝全仓死循环遍历和几十屏原始日志刷屏。
-
-一旦碰到技术选型或架构分支，主模型用 `grill-me` 抛出 2 到 3 个带明确倾向的选择题，把方案定死，并在开工前列出本次明确不改动的文件列表（`Out of Scope`）。代码里能查出来的客观事实自己查，不打扰人。
-
-### 2. 耦合代码单人改，同文件禁并发 `patch`，两轮不过立刻停手
-
-相互接线的组件、全局 Store 和路由流，必须由主窗口的 `Argon` 一口气写完；独立模块实现与回归测试则派给 `delegate_task`（`group/work`）。**严禁在同一回合内对同一个文件并发发出多个 `patch` 调用**（单回合跨文件 `patch` 不超过 3 个），超过 3 处改动必须顺序执行或合并为单次大块替换，杜绝双重转义 `\\n` 与连续匹配失败触发 8 次工具停机熔断。改多语言文案时，等中文或英文基准改完，派一个 `Gemini 3.8 Flash` 一次性写完整套语言包，坚决不拆成多个子任务并发写。
-
-写 TypeScript 遵循内置的规范：用可辨识联合（Discriminated Unions）代替随处乱飞的布尔标记，在网络和存储边界用 Zod 解析收敛类型，状态变更要求幂等。代码注释只写 `// WHY:`，交代平台坑点或协议限制，省得后面其他模型接手时顺手删掉关键防御逻辑。
-
-**两轮重置原则**：如果一个 Bug 连续改了两轮测试还没过，立刻停手，禁止盲目叠加第三层补丁。退回到初始上下文重新检查假设，或者临时切到 `opus` 单点排查。
-
-### 3. 三层机器验证，不用肉眼脑补
-
-首先抽离状态机逻辑。碰到复杂的重连、抢占或权限流，把状态逻辑抽出来跑乱序测试，或者借由 `statechart` 调用 TLC 将 TLA+ 规格直接输出为 Mermaid 图和最短反例路径。
-
-其次看真实运行态证据。单测跑通后，用 `blast-radius` 梳理跨模块改动依赖的那个关键事实，写极简脚本测它一下；没拿到运行期证据的调用点老老实实标为 `UNPROVEN`。汇报性能变化必须走完 `benchmark-checklist` 的 7 项核实。
-
-最后用极端数据推测几何排版。用 `break-ui` 的长德语词、长邮箱和极端空/满列表压测布局，抓取 Android `bounds` 或 DOM `getBoundingClientRect` 坐标，核对无误后再截亮暗色图发给主模型核验。
-
-### 4. 代码精简与异血统盲审
-
-改动过大时先调 `simplify-code`，分头筛一遍是否有现成库函数可用、是否有没关的监听句柄以及多余状态。
-
-准备提交前，把分支交给 `GPT-6.1-Sol (high)`。审代码时不带之前的聊天上下文，只给任务说明、真实 `git diff` 与测试输出：
-* 第一遍对账需求：有没有少写，以及有没有自作聪明添加了计划外的私货。
-* 第二遍查健壮性：重点揪资源泄漏、竞态时序和错误捕获缺失。
-
-### 5. 踩过的坑变成静态检查（Lint-as-Memory）与交付前 3 问门禁
-
-大模型会遗忘写在文档里的规则，但通不过 CI 脚本就无法合入。每解决一个典型暗坑（比如多层内边距嵌套、写死十六进制色值、遗漏本地化字段），随手在项目的检查脚本里补一条正则或静态断言。同时所有 Skill 遵循 **主从瘦身架构（Hub-and-Spoke）**：主文件 `SKILL.md` 控制在 6,000 字符以内，细分场景按需加载 `references/`，避免开局吞掉几万 Token。
-
-提交 PR 报完工前强制过 **3 问自检门禁**：① 新增容错/恢复开关是否默认开启（让用户开箱即获益）？② PR 标题与正文语言是否匹配目标上游仓库（英文仓库用英文、中文仓库用中文）？③ 推送后是否已跟进 `gh pr checks` 确认远端 CI 跑绿？
-
-遇到核心推导或重要方案设计，用 `llm-wiki` 沉淀进本地知识库的索引里，后续开新窗口读一页 `index.md` 就能继续上下文。
+1. **Stage 0 · 接单立界**：核对目标仓 `AGENTS.md` 与上游基线，**禁止在主工作区直接切分支**（必建独立 `worktree`）；先跑 `how` 摸清运行时流向，改旧防御逻辑前跑 `why` 查 git/PR 意图，跨模块先用 `architect` 画两套骨架，分叉需求用 `grill-me` 锁死边界与 `Out of Scope`。
+2. **Stage 1 · 定位与施工**：修 Bug 先跑 `systematic-debugging` 建最小失败复现，未知技术先做一次性 `spike`；写测试遵守 `test-value`（答清“什么错会挂 / 会不会误伤重构 / 是否有重复覆盖”，**严禁在测试中引入 `node:vm` / `eval` / `new Function`**）；重复踩过的坑用 `correct` 按“架构 → 类型 → Lint → 行为测试 → 文档”最高层级固化；大改前用 `simplify-codebase` 清理冗余。
+3. **Stage 2 · 本地门禁与独立终审**：先 `git fetch && git rebase` 对齐基线并重编产物，串行跑通 `check` 与测试；高风险并发/权限/协议改动加跑 `interrogate`（只保留真实命令复现出来的缺陷）；改动 **≥2 个源码文件**或触及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 前强制由只读 `reviewer` 过四维盲审（边界私货、安全与脱敏、`test-value` 鉴别力、废话注释与 `@ts-ignore`/`eslint-disable` 清理）。
+4. **Stage 3 · 规范提 PR**：匹配目标仓库语言与 PR 模板（`yeet` / `github`），正文一律用**无 BOM UTF-8** `--body-file` 提交；严禁添加 AI `Co-Authored-By` 或擅自触发 review bot；调试截图禁入源码主干且严禁暴露本机用户名与绝对路径。
+5. **Stage 4 · 推后巡检与评论闭环**：push 后立刻查 `gh pr view --json mergeStateStatus`（遇 `DIRTY` 立即解冲突重推防跳过 CI）与 `gh pr checks`（失败走 `gh-fix-ci`）；收到评审意见走 `gh-address-comments` 在原 thread 回复并显式执行 GraphQL `resolveReviewThread`，合入后用 `--delete-branch` 清理分支。
 
 ---
 
 <details>
-<summary><b>展开查看 20 个内置工程技能与协议清单</b></summary>
+<summary><b>展开查看 40 个内置工程技能与许可证清单</b></summary>
 <br>
 
 所有技能均放置于 [`skills/`](./skills) 目录。完整修改说明与协议条款见 [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md)。
 
 | 领域 | 技能目录 | 具体用途 | 来源与许可证 |
 | :--- | :--- | :--- | :--- |
-| **架构与开发主线** | `rigorous-dev` | 串联分支排查、两轮重置、几何验证与盲审的主线流程 | MIT (`Nous Research` / 本项目扩展) |
-| | `grill-me` | 动手前按决策分支向开发者提问，带有推荐解 | MIT (`mattpocock/skills`) |
-| | `improve-codebase-architecture` | 识别浅层模块封装，拦截三类常见架构坏味道 | MIT (`mattpocock/skills` + `cursor/pstack`) |
-| | `typescript-best-practices` | 可辨识联合、名义类型、边界 Zod 校验与穷尽匹配 | MIT (`cursor/plugins/pstack`) |
-| | `blast-radius` | 评估跨模块修改影响面，建立运行期证据梯 | MIT (`cursor/plugins/pstack`) |
-| | `statechart` | 基于 SANY 与 TLC 将 TLA+ 规格编译为 Mermaid 状态图和反例链 | MIT (`cursor/plugins/pstack`) |
-| | `benchmark-checklist` | 性能汇报前的 7 项防夸大与实测基准核查清单 | MIT (`cursor/plugins/pstack`) |
-| | `simplify-code` | 从复用、清晰度、性能三个角度精简近期改动 | MIT (`Nous Research`) |
-| | `subagent-driven-development` | 驱动子任务并在交付前跑规格与质量双审查 | MIT (`obra/superpowers`) |
-| | `agent-merge-conflict-arbiter` | 结合双方提交意图与测试结果仲裁 Git 冲突 | MIT (`Nous Research`) |
+| **Stage 0 · 侦察与设计** | `how` | 变更陌生模块前梳理运行时数据流与归属心智模型 | MIT (Adapted) |
+| | `why` | 动旧代码前查 git blame/log 与 PR/Issue 意图，区分实证与推断 | MIT (Adapted) |
+| | `architect` | 写码前画两套截然不同的类型/签名骨架并筛除架构红旗 | MIT (Adapted) |
+| | `grill-me` | 按依赖树前沿轮次拷问，对齐分支决策并附上推荐解 | MIT (`rafaumeu` / `mattpocock` / Hermes) |
+| | `improve-codebase-architecture` | 识别浅层模块封装与三大 AI 常见架构坏味道 | MIT (`mattpocock/skills` + `cursor/pstack`) |
+| **Stage 1 · 施工、测试与防呆** | `systematic-debugging` | 四阶段根因定位：先建紧凑失败循环再动手修改 | MIT (`obra/superpowers` / Hermes) |
+| | `spike` | 高风险方案敲定前的可抛弃式可行性实验与对比 | MIT (`gsd-build/get-shit-done` / Hermes) |
+| | `test-value` | 评估测试鉴别力与反馈成本，防止 AI 自写自测假绿 | MIT (`tt-a1i`) |
+| | `correct` | 将反复发生的同类错误按架构→类型→Lint→测试→文档固化 | MIT (Adapted) |
+| | `simplify-codebase` | 基于调用链证据移除死代码、重复状态与过度抽象（熵回收） | MIT (`simplify-codebase contributors`) |
+| | `simplify-code` | 从复用、清晰度与性能角度快速精简近期 diff | MIT (`Nous Research`) |
+| | `security-best-practices` | Python / JS / TS / Go 安全基线审查与漏洞修复 | Apache-2.0 (`OpenAI / Codex`) |
+| | `typescript-best-practices` | 可辨识联合、名义类型、Zod 边界解析与穷尽匹配 | MIT (`cursor/plugins/pstack`) |
+| | `rigorous-dev` | Hermes 单体主线工作流（两轮重置、同文件禁并发 patch、3 问门禁） | MIT (`dreamfarer-space` & `Nous Research`) |
+| | `subagent-driven-development` | 驱动子任务并在交付前执行规格与质量双审查 | MIT (`obra/superpowers`) |
+| | `agent-merge-conflict-arbiter` | 结合双方提交意图与测试结果仲裁 Git 合并冲突 | MIT (`Nous Research`) |
+| | `codebase-inspection` | 使用 `pygount` 统计仓库代码行数、语言构成与注释占比 | MIT (`Nous Research`) |
+| | `localization` | 多语言字典与 Android/iOS 资源生成、转义与对齐校验 | MIT (`Nous Research`, sanitized) |
+| | `node-inspect-debugger` | 通过 `--inspect` 与 CDP CLI 调试 Node.js 运行时状态 | MIT (`Nous Research`) |
+| | `python-debugpy` | 使用 `pdb` 与 `debugpy`（DAP）排查 Python 运行态问题 | MIT (`Nous Research`) |
+| **Stage 2 · 实证与机器验证** | `interrogate` | 派出对抗探测子智能体实跑击穿改动，仅留有命令证据的缺陷 | MIT (Adapted) |
+| | `blast-radius` | 评估跨模块修改爆破半径，建立运行期 5 级证据梯 | MIT (`cursor/plugins/pstack`) |
+| | `statechart` | 用 SANY 与 TLC 将 TLA+ 规格编译为 Mermaid 状态图与反例链 | MIT (`cursor/plugins/pstack`) |
+| | `benchmark-checklist` | 性能汇报前的 7 项防夸大与可复现基准核查清单 | MIT (`cursor/plugins/pstack`) |
+| **Stage 3 & 4 · PR 与 CI 闭环** | `yeet` | 按目标仓库规范暂存、提交、推送并创建/更新 PR | Apache-2.0 (`OpenAI / Codex`, sanitized) |
+| | `github` | `gh` CLI 通用运维中心（Issue、Review、Release、Auth） | MIT (`Nous Research`, sanitized) |
+| | `gh-fix-ci` | 拉取 GitHub Actions 失败日志、定位根因并计划修复 | Apache-2.0 (`OpenAI / Codex`) |
+| | `gh-address-comments` | 拉取 PR 全部评论与线程，修复回复并执行 `resolveReviewThread` | Apache-2.0 (`OpenAI / Codex`) |
+| | `github-pr-assessment` | 综合评估目标 PR 改动范围、门禁状态与合并概率 | MIT (`Nous Research`) |
 | **界面交互与多端** | `vercel-react-native-skills` | React Native / Expo 列表渲染、布局与原生交互准则 | MIT (`vercel-labs/agent-skills`) |
 | | `animate-expo` | Reanimated 动效门禁，高频操作防卡顿与 UI 线程手势 | MIT (`emilkowalski/skills`) |
-| | `break-ui` | 注入长德语字符串、极端邮箱和空满数据压测边界 | MIT (`emilkowalski/skills`) |
-| | `mobile-native` | 规避移动端 Web 的 `:hover` 残留、视口高度与表单缩放问题 | MIT (`emilkowalski/skills`) |
+| | `break-ui` | 注入长德语字符串、超长邮箱与空满数据压测 UI 边界 | MIT (`emilkowalski/skills`) |
+| | `mobile-native` | 规避移动端 Web 的 `:hover` 粘滞、视口高度与表单缩放问题 | MIT (`emilkowalski/skills`) |
 | | `write-swift` | Swift 现代值类型设计与递进式并发规范 | MIT (`emilkowalski/skills`) |
 | | `emil-design-eng` | Emil Kowalski 的 UI 细节与过渡缓动时间标准 | MIT (`emilkowalski/skills`) |
-| | `impeccable` | 页面排版、对比度、视觉层级与反 AI 模板化指引 | Apache-2.0 (`pbakaus/impeccable`) |
+| | `impeccable` | 排版、对比度、视觉层级与反 AI 模板化前端指引 | Apache-2.0 (`pbakaus/impeccable`) |
 | | `frontend-design` | 避免千篇一律的前端排版与质感设计准则 | Apache-2.0 (`anthropics/skills`) |
-| **文档与知识管理** | `humanizer` | 过滤 34 种典型的大模型八股句式和虚假修饰词 | MIT (`blader/humanizer`) |
+| | `gemini-frontend-design` | 面向网页与应用界面的结构、色彩、字体与动效设计指引 | Apache-2.0 (`Google Gemini`) |
+| **文档与知识管理** | `humanizer` | 过滤 34 种典型大模型八股句式与虚假修饰词 | MIT (`blader/humanizer`, sanitized) |
 | | `llm-wiki` | 依托 `raw/`、`concepts/` 和 `index.md` 维护增量知识库 | MIT (`Nous Research`) |
 
 </details>
@@ -171,24 +164,34 @@ hermes config set auxiliary.background_review.reasoning_effort high
 ├── README.md                          # 中文说明
 ├── README.en.md                       # 英文说明
 ├── LICENSE                            # 项目自有代码 MIT 协议
-├── THIRD_PARTY_NOTICES.md             # 内置 20 个技能的上游版权与许可信息
+├── THIRD_PARTY_NOTICES.md             # 内置 40 个技能的上游版权与许可信息
 ├── assets/
 │   ├── hero.svg                       # 顶部题图
-│   ├── model-routing.svg              # 模型角色与路由拓扑
-│   └── pipeline.svg                   # 五步验证流水线示意图
+│   ├── model-routing.svg              # 多模型角色与权限隔离拓扑
+│   └── pipeline.svg                   # 五阶段硬门禁流水线示意图
+├── plugins/
+│   └── workflow/                      # 原生 Antigravity 全局工作流插件包（已脱敏）
+│       ├── plugin.json
+│       ├── README.md
+│       ├── agents/
+│       │   ├── reviewer.md            # 只读四维独立终审代理
+│       │   └── scout.md               # 剥离写工具的只读 + CLI 侦察代理
+│       └── rules/
+│           └── AGENTS.md              # 五阶段硬门禁全局规则模板
 ├── configs/
+│   ├── AGENTS.example.md              # Pi / Claude Code / Magpie 规则模板
 │   └── hermes-config.example.yaml     # Hermes 路由组与防循环策略配置模板
 ├── scripts/
-│   ├── install-skills.sh              # 技能安装脚本（Hermes / Claude / Cursor / .agents）
+│   ├── install-skills.sh              # 一键安装脚本（Antigravity / Hermes / Claude / Cursor / .agents）
 │   └── setup-magpie-groups.sh         # Magpie 路由分组创建脚本
-├── skills/                            # 开箱即用的 20 个工程技能
+├── skills/                            # 40 个开箱即用的工程技能
 │   ├── autonomous-ai-agents/
 │   ├── creative/
 │   ├── research/
 │   └── software-development/
 └── docs/
-    ├── benchmarks-2026-11.md          # 各主力模型实测数据及核验记录
-    └── power-user-patterns.md         # 工程模式与验收思路深度拆解
+    ├── benchmarks-2026-11.md          # 各主力模型实测数据及双栈选型说明
+    └── power-user-patterns.md         # 五阶段硬门禁与工程模式深度拆解
 ```
 
 </details>
@@ -197,4 +200,4 @@ hermes config set auxiliary.background_review.reasoning_effort high
 
 ## 协议
 
-本仓库新增的配置、图表与文档采用 [MIT 许可证](./LICENSE)。内置在 `skills/` 下的第三方开源项目各自遵循其原始的 **MIT** 或 **Apache 2.0** 许可证，详见各子目录及根目录的 [第三方版权声明文件](./THIRD_PARTY_NOTICES.md)。
+本仓库新增的配置、插件模板、图表与文档采用 [MIT 许可证](./LICENSE)。内置在 `skills/` 下的第三方开源项目各自遵循其原始的 **MIT** 或 **Apache 2.0** 许可证，详见各子目录及根目录的 [第三方版权声明文件](./THIRD_PARTY_NOTICES.md)。
