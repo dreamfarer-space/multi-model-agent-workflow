@@ -6,7 +6,7 @@ All requests need: `-H "Authorization: token $GITHUB_TOKEN"`
 
 Use the `gh-env.sh` helper to set `$GITHUB_TOKEN`, `$GH_OWNER`, `$GH_REPO` automatically:
 ```bash
-source "${GITHUB_SKILL_DIR:-${HERMES_HOME:-$HOME/.hermes}/skills/software-development/github}/scripts/gh-env.sh"
+source "${GITHUB_SKILL_DIR:-${ANTIGRAVITY_PLUGIN_DIR:-$HOME/.gemini/config/plugins/workflow}/skills/github}/scripts/gh-env.sh"
 ```
 
 ## Repositories

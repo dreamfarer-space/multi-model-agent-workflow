@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="routing-title routing-desc">
-  <title id="routing-title">Multi-Model Routing and Subagent Isolation Architecture</title>
-  <desc id="routing-desc">Updated multi-model routing architecture: Lead Gemini 4 Hydrogen (High) for Plan/Execute and coupled edits, isolated research/scout/self subagents or 3-family group/work rotation, Gemini 4 Carbon (High) or GPT-6.1-Sol for read-only pre-push blind review, and Claude Opus 5.5 for deadlock escalation.</desc>
+  <title id="routing-title">Antigravity Multi-Model Role &amp; Permission Isolation Architecture</title>
+  <desc id="routing-desc">Antigravity native multi-model routing: Lead Gemini 4 Hydrogen (High) for Plan/Execute and coupled edits, sandboxed research and write-stripped scout for exploration, workspace-isolated self and run_workflow for parallel build/tests, Gemini 4 Carbon (High) via swarm for read-only pre-push blind review, and Claude Opus 5.5 for deadlock escalation.</desc>
   <defs>
     <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 8 5 L 0 9 z" fill="#3b82f6"/>
@@ -15,8 +15,8 @@
 
   <rect width="960" height="540" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
 
-  <text x="32" y="36" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif" font-size="18" font-weight="700" fill="#0f172a">多模型角色分工与权限/配额隔离（Antigravity · Pi · Hermes × Magpie）</text>
-  <text x="32" y="56" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif" font-size="12.5" fill="#64748b">主脑定方案与核心耦合，只读 Scout 剥离写工具勘察，Writer 用 Worktree 隔离施工，异构模型盲审不带对话历史。</text>
+  <text x="32" y="36" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif" font-size="18" font-weight="700" fill="#0f172a">Antigravity 原生子智能体分工与权限隔离架构</text>
+  <text x="32" y="56" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif" font-size="12.5" fill="#64748b">主脑负责 Plan/Execute 与耦合核心，Scout 工具层物理禁写，Writer 用 share/branch 隔离，Carbon 盲审只读 diff。</text>
 
   <g filter="url(#shadow)">
     <rect x="210" y="74" width="540" height="118" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
@@ -27,7 +27,7 @@
 
     <text x="228" y="130" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12.5" fill="#1e293b">• Stage 0 接单立界：how / why / architect（两版骨架）+ grill-me 锁死 Out-of-Scope</text>
     <text x="228" y="150" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12.5" fill="#1e293b">• 独自修改强耦合 Store / 路由 / UI；主会话严禁单枪匹马超过 30 次文件读写</text>
-    <text x="228" y="174" font-family="SFMono-Regular, Consolas, monospace" font-size="11" fill="#64748b">Hermes 替代主脑：antigravity/gemini-4-argon (Ultra 5h) | 辅助压缩/视觉同池隔离</text>
+    <text x="228" y="174" font-family="SFMono-Regular, Consolas, monospace" font-size="11" fill="#64748b">支持 /plan · /grill-me · /boost · /teamwork 原生调度，禁止循环轮询子任务状态</text>
   </g>
 
   <path d="M 480 192 L 480 214 L 175 214 L 175 236" fill="none" stroke="#3b82f6" stroke-width="1.75" marker-end="url(#arrowBlue)"/>
@@ -43,23 +43,23 @@
 
     <text x="44" y="296" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#1e293b">• research：无网络无终端纯静态读源码</text>
     <text x="44" y="316" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#1e293b">• scout：git log / gh 考古 + 最小复现</text>
-    <text x="44" y="336" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#1e293b">• 剥离 edit_file / write_file 工具权限</text>
-    <text x="44" y="362" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" font-weight="600" fill="#0f766e">硬预算：≤25 次调用 · ≤8 文件 · ≤50 行</text>
-    <text x="44" y="382" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">带精确 file:line 证据回传即止，严禁轮询</text>
+    <text x="44" y="336" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#1e293b">• agents/scout.md 剥离写工具权限</text>
+    <text x="44" y="362" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" font-weight="600" fill="#0f766e">契约：写明目录边界 · ≤50 行附 file:line</text>
+    <text x="44" y="382" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">禁止全仓盲目遍历，轻量调研禁拉 swarm</text>
   </g>
 
   <g filter="url(#shadow)">
     <rect x="338" y="240" width="284" height="162" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
     <path d="M 338 250 Q 338 240 348 240 L 612 240 Q 622 240 622 250 L 622 274 L 338 274 Z" fill="#f1f5f9"/>
-    <text x="354" y="262" font-family="SFMono-Regular, Consolas, monospace" font-size="12" font-weight="700" fill="#334155">3. 并行施工 · self / group/work</text>
+    <text x="354" y="262" font-family="SFMono-Regular, Consolas, monospace" font-size="12" font-weight="700" fill="#334155">3. 并行施工 · self / run_workflow</text>
     <rect x="530" y="247" width="80" height="20" rx="4" fill="#e2e8f0"/>
     <text x="537" y="261" font-family="SFMono-Regular, Consolas, monospace" font-size="10" font-weight="600" fill="#475569">≤5 并发隔离</text>
 
     <text x="354" y="296" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#0f172a">Workspace="share" | "branch"</text>
     <text x="354" y="318" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#1e293b">• 独立模块实现、test-value 回归与多语言</text>
-    <text x="354" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#1e293b">• 大规模分片走 run_workflow Python 编排</text>
-    <text x="354" y="362" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" font-weight="600" fill="#2563eb">Hermes 三族轮询池：DeepSeek + MiniMax</text>
-    <text x="354" y="382" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">+ Gemini 3.8 Flash (rotate/turn)</text>
+    <text x="354" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#1e293b">• 大规模分片流水线用 run_workflow</text>
+    <text x="354" y="362" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" font-weight="600" fill="#2563eb">正确固化：架构 → 类型 → Lint → 测试</text>
+    <text x="354" y="382" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">测试严禁引入 node:vm / eval / new Function</text>
   </g>
 
   <g filter="url(#shadow)">
@@ -72,8 +72,8 @@
     <text x="654" y="296" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="600" fill="#0f172a">高风险并发/权限/协议改动必跑</text>
     <text x="654" y="318" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#1e293b">• 在隔离工作区尝试复现击穿改动</text>
     <text x="654" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#1e293b">• 仅真实命令/测试输出证明的缺陷存活</text>
-    <text x="654" y="362" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" font-weight="600" fill="#0f766e">禁止测纯 mock；测试禁 node:vm / eval</text>
-    <text x="654" y="382" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">记忆压缩 (Hermes)：MiniMax-M3.1-Flash</text>
+    <text x="654" y="362" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" font-weight="600" fill="#0f766e">配合 statechart / blast-radius / break-ui</text>
+    <text x="654" y="382" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">无真实执行证据的臆测一律丢弃</text>
   </g>
 
   <path d="M 175 402 L 175 420 L 480 420 L 480 434" fill="none" stroke="#d97706" stroke-width="1.75" marker-end="url(#arrowAmber)"/>
@@ -83,8 +83,8 @@
   <g filter="url(#shadow)">
     <rect x="28" y="438" width="904" height="82" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="1.75"/>
     <path d="M 28 448 Q 28 438 38 438 L 922 438 Q 932 438 932 448 L 932 468 L 28 468 Z" fill="#fffbeb"/>
-    <text x="44" y="458" font-family="SFMono-Regular, Consolas, monospace" font-size="12" font-weight="700" fill="#b45309">5. 推前独立四维终审 (Gemini 4 Carbon High / GPT-6.1-Sol)  &amp;  死锁急救 (Claude Opus 5.5)</text>
+    <text x="44" y="458" font-family="SFMono-Regular, Consolas, monospace" font-size="12" font-weight="700" fill="#b45309">5. 推前独立四维终审 (swarm: gemini-4-carbon-high / reviewer)  &amp;  死锁急救 (Claude Opus 5.5)</text>
     <text x="44" y="488" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#1e293b">• reviewer 终审（改动 ≥2 源码文件或状态机/权限/安全/IPC 必触发）：只读核查 ①边界/私货 ②安全/脱敏/竞态 ③test-value 鉴别力 ④废话注释与抑制标记</text>
-    <text x="44" y="508" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#64748b">• Opus 5.5 急救：SWE-bench Pro 89.9% (#1)，严禁跑长链路；仅在主脑连修 2 轮不过时单回合外科定位根因</text>
+    <text x="44" y="508" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#64748b">• 出结论后立即 swarm kill 释放资源；主脑连修 2 轮不过则停手重置或切 Opus 5.5 单回合定位根因</text>
   </g>
 </svg>

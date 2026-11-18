@@ -1,8 +1,8 @@
-MIT License
+﻿MIT License
 
-Copyright (c) 2025 Jesse Vincent (obra/superpowers), ported by Nous Research
-Upstream: https://github.com/obra/superpowers
-Modifications: Hermes Agent port.
+Copyright (c) 2026 Vercel, Inc.
+Upstream: https://github.com/vercel-labs/agent-skills
+Modifications: Unmodified upstream skill.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

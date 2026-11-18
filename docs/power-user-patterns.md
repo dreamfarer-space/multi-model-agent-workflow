@@ -1,19 +1,19 @@
-# 顶尖 AI 工程师工作流与五阶段硬门禁精粹
+# Antigravity 多模型工程工作流与五阶段硬门禁精粹
 
-本文整理自一线工程团队与开源工作流（`superpowers`、`gstack`、`grill-me`、`cursor/pstack`、Emil Kowalski 及 Google Antigravity / Hermes / Pi 实战经验），重点回答一个问题：**怎样靠机制和静态门禁，而不是靠“求模型别犯错”，把多模型协作跑稳。**
+本文沉淀本插件（`rules/AGENTS.md` + `agents/{scout,reviewer}.md` + 33 个 `skills/`）背后的工程设计原则：**不靠“求模型别犯错”，而是靠工具权限物理剥离、独立工作区隔离、五阶段硬门禁与静态检查，把 AI 协作跑稳。**
 
 ---
 
 ## 一、五阶段硬门禁工程流（Stage 0 – Stage 4）
 
 ### Stage 0 · 接单立界（Scope & Grounding）
-1. **Worktree 基线隔离**：先核对目标仓库 `AGENTS.md` / `CONTRIBUTING.md`、当前分支与 `upstream/main`（或 `origin/main`）基线；**禁止直接在主工作区切开发分支**，新建独立 `git worktree` 或隔离分支再动手。
+1. **Worktree 基线隔离**：先核对目标仓库 `AGENTS.md` / `CONTRIBUTING.md`、当前分支与 `upstream/main`（或 `origin/main`）基线；**禁止直接在主工作区切开发分支**，新建独立 `git worktree` 或用 `Workspace="branch"` / `"share"` 再动手。
 2. **`how` + `why` 先查后改**：
-   - 陌生模块先跑 **`how`** 梳理调用链与状态归属，拿到 onboarding 级心智模型。
+   - 陌生模块先跑 **`how`**（调 `research` / `scout`）梳理调用链与状态归属，拿到 onboarding 级心智模型。
    - 改动旧逻辑、重试/超时或防错保护前先跑 **`why`**（`git blame` / `git log` / `gh pr view`），严格区分“已验证事实”与“合理推断”，避免顺手删掉历史踩坑留下的刻意防御。
 3. **`architect`（Design It Twice）+ `grill-me`（Frontier Rounds）**：
    - 非平凡跨模块改动先用 **`architect`** 写出**至少两套结构截然不同的骨架**（先写类型、签名与调用示例，`not implemented` 占位），过一遍 `design-red-flags` 再定稿；如果施工中出现大量绕路、`any` 强转或意外锁，立刻停下推翻骨架重来，不在错误结构上堆补丁。
-   - 需求或环境术语存在分叉时，用 **`grill-me`** 按依赖树只提问前置条件已定死的“前沿节点（Frontier）”，每题附带推荐答案与一句话理由；能从源码和命令查清的事实一律自己查，不打扰用户。
+   - 需求或环境术语存在分叉时，用 **`grill-me`**（配合 `ask_question` 或 `/grill-me`）按依赖树只提问前置条件已定死的“前沿节点（Frontier）”，每题附带推荐答案与一句话理由；能从源码和命令查清的事实一律自己查，不打扰用户。
    - 开工前明确**单 PR 单目标**与 **`Out of Scope`（禁止触碰的文件与模块）**。
 
 ### Stage 1 · 定位、施工与防呆固化（Locate, Implement & Correct）
@@ -28,9 +28,9 @@
 
 ### Stage 2 · 本地门禁与独立终审（Local Gates & Pre-Push Audit）
 1. **同步基线与全量本地验证**：先 `git fetch && git rebase` 对齐上游基线、重编受影响产物，再**串行**跑通目标仓库 `check` / `typecheck` / `lint` / 受影响测试（严禁多个构建或原生 prebuild 并发争抢）。
-2. **实证对抗探测（`interrogate`）**：高风险并发、权限、协议或状态机改动，在隔离工作区派出对抗侦察尝试击穿改动——**只有真实执行命令或复现脚本跑出来的失败才算数**，无执行证据的猜测一律丢弃。
+2. **实证对抗探测（`interrogate`）**：高风险并发、权限、协议或状态机改动，派出 `invoke_subagent(TypeName="self", Workspace="branch"|"share")` 对抗侦察尝试击穿改动——**只有真实执行命令或复现脚本跑出来的失败才算数**，无执行证据的猜测一律丢弃。
 3. **强制推前独立四维终审（`reviewer`）**：
-   - 凡改动 **≥2 个源码文件**，或涉及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 或开 PR 前**必须**由独立只读 `reviewer`（如 `Gemini 4 Carbon (High)` 或 `GPT-6.1-Sol (high)`）审查，输入**仅限需求边界 + 完整 `git diff` + 本地测试输出**（不传对话历史）：
+   - 凡改动 **≥2 个源码文件**，或涉及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 或开 PR 前**必须**由独立只读 `reviewer`（`swarm` `gemini-4-carbon-high` 或 `invoke_subagent(TypeName="reviewer", Model="pro")`）审查，输入**仅限需求边界 + 完整 `git diff` + 本地测试输出**（不传对话历史）：
      1. **边界与私货（Scope Drift）**：是否偷渡未要求的新功能、多余开关或顺手重构；
      2. **安全、脱敏与并发边界**：信任边界、路径/符号链接逃逸、密钥/个人路径脱敏、竞态与测试禁用检查；
      3. **测试鉴别力（`test-value`）**：断言是否真正绑定可观测行为，而非纯 mock 走过场；
@@ -39,28 +39,26 @@
 
 ### Stage 3 · 规范提 PR（PR Creation Discipline）
 - 优先遵守目标仓库 `AGENTS.md` / `CONTRIBUTING.md`（例如 DCO `git commit -s`、模板分段、资产隔离分支）；通用仓库使用 **`yeet`** 与 **`github`**。
-- **通用红线**：保持仓库 `user.email` 一致；PR 标题与正文语言匹配目标仓库主语言；**严禁添加 AI `Co-Authored-By`**；**严禁擅自触发自动 review bot**；PR 正文一律写为**无 BOM 的 UTF-8** 临时文件再传 `--body-file`。
+- **通用红线**：保持仓库 `user.email` 一致；PR 标题与正文语言匹配目标仓库主语言；**严禁添加 AI `Co-Auth-By`**；**严禁擅自触发自动 review bot**；PR 正文一律写为**无 BOM 的 UTF-8** 临时文件再传 `--body-file`。
 - **隐私与媒体红线**：调试/验收截图严禁提交进源码主干或 Issue（仅作 PR 描述原生附件或推至仓库隔离资产分支），上传前确认无本机用户名、个人绝对路径、Token 或未脱敏二维码。
 
 ### Stage 4 · 推后巡检与评论闭环（Post-Push CI & Review Loop）
-1. **防 `DIRTY` 静默跳过 CI**：Push 后立即检查 `gh pr view --json mergeStateStatus`；若为 `DIRTY` 立刻解冲突 rebase 重推（否则 GitHub 会静默跳过 CI），再通过 `gh pr checks` 与 **`gh-fix-ci`** 跟进直到必过项全部变绿。
+1. **防 `DIRTY` 静默跳过 CI**：Push 后立刻检查 `gh pr view --json mergeStateStatus`；若为 `DIRTY` 立刻解冲突 rebase 重推（否则 GitHub 会静默跳过 CI），再通过 `gh pr checks` 与 **`gh-fix-ci`** 跟进直到必过项全部变绿。
 2. **评论与 Thread 闭环（`gh-address-comments`）**：拉齐普通评论、Review 与全部 Review Threads → 修复并重走 Stage 2/3 → 在原 thread 写清无 BOM UTF-8 回复并**显式执行 GraphQL `resolveReviewThread`**（否则 `isResolved=false` 仍会卡住合并）。
 3. 合入后优先使用 `--delete-branch` 清理特性分支。
 
 ---
 
-## 二、上下文卫生与子智能体隔离（Context Hygiene）
+## 二、Antigravity 原生子智能体隔离与预算
 
-1. **主脑工具预算与禁止轮询**：
-   - 主会话锁死根因与接口契约后，只读侦察交给 `research`（纯静态无终端沙盒）或 `scout`（物理剥离 `edit_file`/`write_file` 的只读 + CLI 侦察），独立模块实现与测试交给隔离写作者（`self` / `worker` / `group/work`）或 `run_workflow`。
-   - **严禁主脑在根会话单枪匹马连续执行超过 30 次文件读写**；派发子智能体或后台命令后直接结束当前回合等待系统唤醒，严禁循环轮询状态。
-   - **硬封顶预算**：单子智能体 Prompt 明确限制 **≤25 次工具调用、≤8 个目标文件、回传 ≤50 行浓缩结论 + 精确 `file:line`**。
-2. **耦合代码单人主刀，同文件禁并发修改**：
-   - 相互接线的 UI 组件、全局 Store 与路由流必须由主会话同一写作者完成；多语言字典由单个子智能体一次性对齐；单批并行子智能体上限锁死 **≤5 路**。
-   - 严禁同一回合内对同一文件发出多个局部替换调用，大段修改合并为单次替换或顺序执行，传入真实换行符而非双重转义 `\\n`。
-3. **Hermes 并发优化与 Worktree 生命周期**：
-   - 开启 `delegation.independent_completions: true`（先完成先回调，防长尾拖慢整批）、`prefix_stagger_seconds: 8`（错峰预热 Prompt Cache，避开瞬间 `429` 限流）、`max_summary_chars: 8000` 与 `child_timeout_seconds: 1800`。
-   - 开启 `worktree_isolation: true` 时，子智能体退出后 Hermes 会自动将物理 `.worktrees/subagent-<id>` 归档至 `refs/hermes/archive/...` 并删除目录；父会话必须通过保留分支 `hermes-subagent/subagent-<id>` 或 `git diff` 整合改动，严禁直接 `cd` 进已销毁的目录。
+1. **三类子智能体各司其职**：
+   - **`research`（内置静态沙盒）**：纯源码静态阅读与跨目录符号检索，无网络无终端。
+   - **`scout`（`agents/scout.md`）**：授予 `read_file`、`run_command`、`manage_task`、`search_web`，工具层**物理剥离 `edit_file` / `write_file`**，专门跑 `git log`/`gh` 考古与 Phase 1 复现。
+   - **`self`（`Workspace="inherit"|"share"|"branch"`）与 `run_workflow`**：独立模块施工、回归测试、多语言同步或 Python 大规模分片流水线。
+2. **严控预算与禁空转轮询**：
+   - **主脑工具预算**：禁止主会话单枪匹马连续超过 30 次文件读写。
+   - **并发与摘要封顶**：单批并发 **≤5 路**；每次派发必须写死目录/文件边界与返回契约（**≤50 行摘要附 `file:line` 真实证据**）。
+   - **禁止轮询**：派发 `invoke_subagent`、后台命令或 `swarm` 后直接结束当前回合等待系统唤醒，严禁循环查状态或设定时器轮询；轻量只读调研禁止滥用 `swarm`。
 
 ---
 
@@ -82,5 +80,6 @@
 
 ## 四、Skill 主从瘦身架构（Hub-and-Spoke）
 
-- 主文件 `SKILL.md` 控制在简洁可执行边界内（核心铁律 + 按需路由表 Routing Table），细分排障、模板与语言细节全部下沉到 `references/*.md` 按需加载，避免开局一次性吞掉数万 Token 稀释主脑注意力。
+- 主文件 `SKILL.md` 只保留核心铁律与按需路由表（Routing Table），细分排障、模板与语言细节全部下沉到 `references/*.md` 按需加载，避免开局一次性吞掉数万 Token 稀释主脑注意力。
 - 长期架构推导与踩坑沉淀使用 **`llm-wiki`**（`raw/` + `concepts/` + `index.md`），新会话读一页 `index.md` 即可接续上下文。
+- 早期 Hermes Agent × Magpie 配置归档见 [legacy-hermes.md](./legacy-hermes.md)。

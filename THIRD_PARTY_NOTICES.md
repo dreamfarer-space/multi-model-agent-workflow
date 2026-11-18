@@ -4,46 +4,39 @@ This repository bundles and adapts open-source Agent Skills under the **MIT Lice
 
 | Bundled Skill Path | License | Copyright Holder & Upstream Source | Adaptation Notes |
 | :--- | :--- | :--- | :--- |
-| `skills/software-development/rigorous-dev` | `MIT` | Copyright (c) 2026 dreamfarer-space & Nous Research ([Source](https://github.com/NousResearch/hermes-agent)) | Extended with multi-model routing, grill-me gate, two-strike reset, TLA+ statechart, blast-radius, and UI geometry checks. |
-| `skills/software-development/grill-me` | `MIT` | Copyright (c) 2026 Rafael Zendron, Matt Pocock, & Hermes Agent ([Source](https://github.com/mattpocock/skills)) | Updated to v2.0.0 frontier-rounds interview and adapted subagent tool references for Antigravity (`invoke_subagent` / `ask_question`). |
-| `skills/software-development/simplify-code` | `MIT` | Copyright (c) 2026 Nous Research ([Source](https://github.com/NousResearch/hermes-agent)) | Unmodified upstream skill. |
-| `skills/software-development/subagent-driven-development` | `MIT` | Copyright (c) 2025 Jesse Vincent (obra/superpowers), ported by Nous Research ([Source](https://github.com/obra/superpowers)) | Hermes Agent port. |
-| `skills/autonomous-ai-agents/agent-merge-conflict-arbiter` | `MIT` | Copyright (c) 2026 Nous Research ([Source](https://github.com/NousResearch/hermes-agent)) | Unmodified upstream skill. |
-| `skills/software-development/improve-codebase-architecture` | `MIT` | Copyright (c) 2026 Matt Pocock; design-red-flags.md Copyright (c) 2026 Lauren Tan ([Source](https://github.com/mattpocock/skills)) | Adapted skill invocation for Hermes Agent and added references/design-red-flags.md from cursor/plugins/pstack. |
-| `skills/software-development/typescript-best-practices` | `MIT` | Copyright (c) 2026 Lauren Tan ([Source](https://github.com/cursor/plugins/tree/main/pstack)) | Removed Cursor-only frontmatter flag for cross-agent compatibility. |
-| `skills/software-development/blast-radius` | `MIT` | Copyright (c) 2026 Lauren Tan ([Source](https://github.com/cursor/plugins/tree/main/pstack)) | Removed Cursor-only frontmatter flag for cross-agent compatibility. |
-| `skills/software-development/benchmark-checklist` | `MIT` | Copyright (c) 2026 Lauren Tan ([Source](https://github.com/cursor/plugins/tree/main/pstack)) | Removed Cursor-only frontmatter flag for cross-agent compatibility. |
-| `skills/software-development/statechart` | `MIT` | Copyright (c) 2026 Lauren Tan ([Source](https://github.com/cursor/plugins/tree/main/pstack)) | Added Windows taskkill process cleanup support and portable TLA2TOOLS/JAVA environment resolution; excluded test corpus for package size. |
-| `skills/software-development/vercel-react-native-skills` | `MIT` | Copyright (c) 2026 Vercel, Inc. ([Source](https://github.com/vercel-labs/agent-skills)) | Unmodified upstream skill. |
-| `skills/software-development/animate-expo` | `MIT` | Copyright (c) 2026 Emil Kowalski ([Source](https://github.com/emilkowalski/skills)) | Removed interactive Initial Response greeting block for background skill loading. |
-| `skills/software-development/break-ui` | `MIT` | Copyright (c) 2026 Emil Kowalski ([Source](https://github.com/emilkowalski/skills)) | Removed Initial Response greeting block and escaped ZWJ/scanner false-positive strings. |
-| `skills/software-development/mobile-native` | `MIT` | Copyright (c) 2026 Emil Kowalski ([Source](https://github.com/emilkowalski/skills)) | Removed interactive Initial Response greeting block for background skill loading. |
-| `skills/software-development/write-swift` | `MIT` | Copyright (c) 2026 Emil Kowalski ([Source](https://github.com/emilkowalski/skills)) | Removed interactive Initial Response greeting block for background skill loading. |
-| `skills/creative/emil-design-eng` | `MIT` | Copyright (c) 2026 Emil Kowalski ([Source](https://github.com/emilkowalski/skills)) | Removed interactive Initial Response greeting block for background skill loading. |
-| `skills/creative/impeccable` | `Apache-2.0` | Copyright 2025 Paul Bakaus (derived from anthropics/skills/frontend-design) ([Source](https://github.com/pbakaus/impeccable)) | Unmodified upstream skill. |
-| `skills/creative/frontend-design` | `Apache-2.0` | Copyright 2025 Anthropic, PBC ([Source](https://github.com/anthropics/skills)) | Unmodified upstream skill. |
-| `skills/creative/humanizer` | `MIT` | Copyright (c) Siqi Chen (@blader), ported by Nous Research ([Source](https://github.com/blader/humanizer)) | Updated to v2.5.1 and sanitized tool references for public distribution. |
-| `skills/research/llm-wiki` | `MIT` | Copyright (c) 2026 Nous Research (based on Andrej Karpathy LLM Wiki pattern) ([Source](https://github.com/NousResearch/hermes-agent)) | Updated upstream Hermes Agent skill. |
-| `skills/creative/gemini-frontend-design` | `Apache-2.0` | Google Gemini Frontend Design | Bundled frontend design skill. |
-| `skills/software-development/how` | `MIT` | Adapted for Antigravity / multi-agent codebase exploration | Bundled workflow Stage 0 walkthrough skill. |
-| `skills/software-development/why` | `MIT` | Adapted for Antigravity / multi-agent git & PR archaeology | Bundled workflow Stage 0 rationale investigation skill. |
-| `skills/software-development/architect` | `MIT` | Adapted for Antigravity / multi-agent design-twice sketching | Bundled workflow Stage 0 architecture skill. |
-| `skills/software-development/correct` | `MIT` | Adapted for Antigravity / multi-agent mistake-class elimination | Bundled workflow Stage 1 guardrail escalation skill. |
-| `skills/software-development/interrogate` | `MIT` | Adapted for Antigravity / multi-agent adversarial verification | Bundled workflow Stage 2 executed-repro verification skill. |
-| `skills/software-development/test-value` | `MIT` | Copyright (c) 2026 tt-a1i (`LICENSE` bundled in skill directory) | Bundled workflow Stage 1 test discrimination skill. |
-| `skills/software-development/simplify-codebase` | `MIT` | Copyright (c) 2026 simplify-codebase contributors (`LICENSE` bundled in skill directory) | Bundled evidence-backed complexity removal skill. |
-| `skills/software-development/systematic-debugging` | `MIT` | Hermes Agent (adapted from `obra/superpowers`) ([Source](https://github.com/NousResearch/hermes-agent)) | Bundled 4-phase root-cause debugging skill. |
-| `skills/software-development/spike` | `MIT` | Lex Christopherson / GSD (`gsd-build/get-shit-done`), ported by Hermes Agent | Bundled throwaway feasibility spike skill. |
-| `skills/software-development/security-best-practices` | `Apache-2.0` | OpenAI / Codex Skills (`LICENSE.txt` bundled in skill directory) | Bundled Python/JS/TS/Go security review skill. |
-| `skills/software-development/yeet` | `Apache-2.0` | OpenAI / Codex Skills (`LICENSE.txt` bundled in skill directory) | Sanitized repo-routing redlines for generic PR submission. |
-| `skills/software-development/gh-fix-ci` | `Apache-2.0` | OpenAI / Codex Skills (`LICENSE.txt` bundled in skill directory) | Bundled GitHub Actions CI debugging skill (`__pycache__` excluded). |
-| `skills/software-development/gh-address-comments` | `Apache-2.0` | OpenAI / Codex Skills (`LICENSE.txt` bundled in skill directory) | Bundled PR review thread reply & resolution skill (`__pycache__` excluded). |
-| `skills/software-development/github` | `MIT` | Hermes Agent ([Source](https://github.com/NousResearch/hermes-agent)) | Sanitized personal repo/path examples for public distribution. |
-| `skills/software-development/github-pr-assessment` | `MIT` | Hermes Agent ([Source](https://github.com/NousResearch/hermes-agent)) | Bundled PR status & merge-odds assessment skill. |
-| `skills/software-development/codebase-inspection` | `MIT` | Hermes Agent ([Source](https://github.com/NousResearch/hermes-agent)) | Bundled pygount LOC/language breakdown skill. |
-| `skills/software-development/localization` | `MIT` | Hermes Agent ([Source](https://github.com/NousResearch/hermes-agent)) | Sanitized workspace package example in `android-resources.md`. |
-| `skills/software-development/node-inspect-debugger` | `MIT` | Hermes Agent ([Source](https://github.com/NousResearch/hermes-agent)) | Bundled Node.js `--inspect` CDP debugging skill. |
-| `skills/software-development/python-debugpy` | `MIT` | Hermes Agent ([Source](https://github.com/NousResearch/hermes-agent)) | Bundled Python `pdb` / `debugpy` debugging skill. |
+| `skills/how` | `MIT` | Antigravity Workflow Skill | Bundled Stage 0 codebase walkthrough skill. |
+| `skills/why` | `MIT` | Antigravity Workflow Skill | Bundled Stage 0 git & PR archaeology skill. |
+| `skills/architect` | `MIT` | Antigravity Workflow Skill | Bundled Stage 0 design-twice skeleton skill. |
+| `skills/grill-me` | `MIT` | Copyright (c) 2026 Rafael Zendron, Matt Pocock, & Hermes Agent ([Source](https://github.com/mattpocock/skills)) | Updated to v2.0.0 frontier-rounds interview and adapted subagent tool references for Antigravity (`invoke_subagent` / `ask_question`). |
+| `skills/systematic-debugging` | `MIT` | Hermes Agent (adapted from `obra/superpowers`) ([Source](https://github.com/NousResearch/hermes-agent)) | Adapted for Antigravity investigation tools (`read_file`, `run_command`, `invoke_subagent`). |
+| `skills/spike` | `MIT` | Lex Christopherson / GSD (`gsd-build/get-shit-done`) | Adapted for Antigravity tools (`search_web`, `invoke_subagent`, `run_workflow`). |
+| `skills/test-value` | `MIT` | Copyright (c) 2026 tt-a1i (`LICENSE` bundled in skill directory) | Bundled Stage 1 test discrimination & feedback-cost skill. |
+| `skills/correct` | `MIT` | Antigravity Workflow Skill | Bundled Stage 1 mistake-class elimination skill. |
+| `skills/simplify-codebase` | `MIT` | Copyright (c) 2026 simplify-codebase contributors (`LICENSE` bundled in skill directory) | Bundled evidence-backed complexity removal skill. |
+| `skills/security-best-practices` | `Apache-2.0` | OpenAI / Codex Skills (`LICENSE.txt` bundled in skill directory) | Bundled Python/JS/TS/Go security review skill. |
+| `skills/typescript-best-practices` | `MIT` | Copyright (c) 2026 Lauren Tan ([Source](https://github.com/cursor/plugins/tree/main/pstack)) | Removed Cursor-only frontmatter flag for cross-agent compatibility. |
+| `skills/codebase-inspection` | `MIT` | Hermes Agent ([Source](https://github.com/NousResearch/hermes-agent)) | Bundled pygount LOC/language breakdown skill. |
+| `skills/localization` | `MIT` | Hermes Agent ([Source](https://github.com/NousResearch/hermes-agent)) | Sanitized workspace package example in `references/android-resources.md`. |
+| `skills/node-inspect-debugger` | `MIT` | Hermes Agent ([Source](https://github.com/NousResearch/hermes-agent)) | Bundled Node.js `--inspect` CDP debugging skill. |
+| `skills/python-debugpy` | `MIT` | Hermes Agent ([Source](https://github.com/NousResearch/hermes-agent)) | Bundled Python `pdb` / `debugpy` debugging skill. |
+| `skills/interrogate` | `MIT` | Antigravity Workflow Skill | Bundled Stage 2 adversarial executed-repro verification skill. |
+| `skills/blast-radius` | `MIT` | Copyright (c) 2026 Lauren Tan ([Source](https://github.com/cursor/plugins/tree/main/pstack)) | Removed Cursor-only frontmatter flag for cross-agent compatibility. |
+| `skills/statechart` | `MIT` | Copyright (c) 2026 Lauren Tan ([Source](https://github.com/cursor/plugins/tree/main/pstack)) | Added Windows `taskkill` cleanup and portable TLA2TOOLS/JAVA resolution; excluded test corpus. |
+| `skills/benchmark-checklist` | `MIT` | Copyright (c) 2026 Lauren Tan ([Source](https://github.com/cursor/plugins/tree/main/pstack)) | Removed Cursor-only frontmatter flag for cross-agent compatibility. |
+| `skills/yeet` | `Apache-2.0` | OpenAI / Codex Skills (`LICENSE.txt` bundled in skill directory) | Sanitized repo-routing redlines for generic PR submission. |
+| `skills/github` | `MIT` | Hermes Agent ([Source](https://github.com/NousResearch/hermes-agent)) | Sanitized personal repo/path examples and fixed `gh-env.sh` relative script resolution. |
+| `skills/gh-fix-ci` | `Apache-2.0` | OpenAI / Codex Skills (`LICENSE.txt` bundled in skill directory) | Adapted plan step for Antigravity `/plan`; excluded `__pycache__`. |
+| `skills/gh-address-comments` | `Apache-2.0` | OpenAI / Codex Skills (`LICENSE.txt` bundled in skill directory) | Added BOM-free UTF-8 and `resolveReviewThread` reminders; excluded `__pycache__`. |
+| `skills/github-pr-assessment` | `MIT` | Hermes Agent ([Source](https://github.com/NousResearch/hermes-agent)) | Sanitized local scratch path example for public distribution. |
+| `skills/react-native-skills` | `MIT` | Copyright (c) 2026 Vercel, Inc. ([Source](https://github.com/vercel-labs/agent-skills)) | Directory normalized to `react-native-skills` for Antigravity skill discovery. |
+| `skills/animate-expo` | `MIT` | Copyright (c) 2026 Emil Kowalski ([Source](https://github.com/emilkowalski/skills)) | Removed interactive Initial Response greeting block for background skill loading. |
+| `skills/break-ui` | `MIT` | Copyright (c) 2026 Emil Kowalski ([Source](https://github.com/emilkowalski/skills)) | Removed Initial Response greeting block and escaped ZWJ/scanner false-positive strings. |
+| `skills/mobile-native` | `MIT` | Copyright (c) 2026 Emil Kowalski ([Source](https://github.com/emilkowalski/skills)) | Removed interactive Initial Response greeting block for background skill loading. |
+| `skills/emil-design-eng` | `MIT` | Copyright (c) 2026 Emil Kowalski ([Source](https://github.com/emilkowalski/skills)) | Removed interactive Initial Response greeting block for background skill loading. |
+| `skills/impeccable` | `Apache-2.0` | Copyright 2025 Paul Bakaus (derived from anthropics/skills/frontend-design) ([Source](https://github.com/pbakaus/impeccable)) | Unmodified upstream skill. |
+| `skills/gemini-frontend-design` | `Apache-2.0` | Google Gemini Frontend Design | Bundled web/app frontend design skill. |
+| `skills/humanizer` | `MIT` | Copyright (c) Siqi Chen (@blader), ported by Hermes Agent ([Source](https://github.com/blader/humanizer)) | Updated to v2.5.1 and sanitized tool references for public distribution. |
+| `skills/llm-wiki` | `MIT` | Copyright (c) 2026 Nous Research (based on Andrej Karpathy LLM Wiki pattern) ([Source](https://github.com/NousResearch/hermes-agent)) | Updated upstream skill. |
 
 ---
 

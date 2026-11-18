@@ -18,7 +18,7 @@ else
     if _hermes_env="${HERMES_HOME:-$HOME/.hermes}/.env"; [ -f "$_hermes_env" ] && grep -q "^GITHUB_TOKEN=" "$_hermes_env"; then
       GITHUB_TOKEN=$(grep "^GITHUB_TOKEN=" "$_hermes_env" | head -1 | cut -d= -f2 | tr -d '\n\r')
     elif grep -q "github.com" ~/.git-credentials 2>/dev/null; then
-      GITHUB_TOKEN=$(uv run python "${GITHUB_SKILL_DIR:-${HERMES_HOME:-$HOME/.hermes}/skills/software-development/github}/scripts/git-credential-token.py")
+      GITHUB_TOKEN=$(uv run python "${GITHUB_SKILL_DIR:-${ANTIGRAVITY_PLUGIN_DIR:-$HOME/.gemini/config/plugins/workflow}/skills/github}/scripts/git-credential-token.py")
     fi
   fi
 fi
@@ -319,7 +319,7 @@ When the user asks you to "review PR #N", "look at this PR", or gives you a PR U
 ### Step 1: Set up environment
 
 ```bash
-source "${GITHUB_SKILL_DIR:-${HERMES_HOME:-$HOME/.hermes}/skills/software-development/github}/scripts/gh-env.sh"
+source "${GITHUB_SKILL_DIR:-${ANTIGRAVITY_PLUGIN_DIR:-$HOME/.gemini/config/plugins/workflow}/skills/github}/scripts/gh-env.sh"
 # Or run the inline setup block from the top of this skill
 ```
 

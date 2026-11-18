@@ -2,7 +2,7 @@
   "name": "workflow",
   "displayName": "Multi-Model Engineering Workflow",
   "version": "2.0.0",
-  "description": "5-stage gated engineering & PR workflow, independent reviewer and scout subagents, quota-isolated model routing, and 40 curated engineering skills.",
+  "description": "5-stage gated engineering & PR workflow, independent reviewer and scout subagents, and 33 curated Antigravity skills.",
   "suggestedPrompts": [
     "按阶段 0 接单立界，先用 how 和 why 梳理目标模块再给方案",
     "跑完本地门禁后调用 reviewer 子智能体对当前 git diff 做推前独立终审",
