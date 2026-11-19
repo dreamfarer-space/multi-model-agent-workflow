@@ -7,7 +7,7 @@
 [![Works with](https://img.shields.io/badge/Works%20with-Google%20Antigravity-orange.svg?style=flat-square)](#最快上手)
 [![Language](https://img.shields.io/badge/Language-English%20%7C%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-lightgrey.svg?style=flat-square)](./README.en.md)
 
-<p>面向 <b>Google Antigravity</b> 的原生工程工作流插件：五阶段硬门禁、权限物理隔离的子智能体、Carbon 推前盲审与 33 个精选工程技能。</p>
+<p>面向 <b>Google Antigravity</b> 的原生工程工作流插件：五阶段硬门禁、权限物理隔离的子智能体、Neon High 顾问参谋与推前盲审及 33 个精选工程技能。</p>
 
 [English](./README.en.md) · **简体中文** · [模型选型基准](./docs/benchmarks-2026-11.md) · [五阶段工程模式](./docs/power-user-patterns.md) · [早期 Hermes 迁移归档](./docs/legacy-hermes.md)
 
@@ -23,7 +23,7 @@
 
 这个插件仓库直接把约束做进 Antigravity 的原生结构里：
 1. **工具层物理隔离与子智能体边界**：主脑（`Gemini 4 Hydrogen (High)`）只管方案定稿与耦合核心；[`agents/scout.md`](./agents/scout.md) 物理剥离 `edit_file` / `write_file` 权限，专职 `git`/`gh` 考古与复现；独立施工使用 `Workspace="share" | "branch"` 隔离或 `run_workflow`，严禁主脑单枪匹马连续超过 30 次文件读写。
-2. **五阶段硬门禁闭环（Stage 0 – Stage 4）**：先 `how` + `why` + `architect` 定界，再 `systematic-debugging` + `test-value` + `correct` 施工，推前过 `interrogate` 实证对抗与只读 [`agents/reviewer.md`](./agents/reviewer.md)（`Gemini 4 Carbon (High)`）四维盲审，推后跟进 `mergeStateStatus` 防跳过 CI 与 GraphQL `resolveReviewThread`。
+2. **五阶段硬门禁闭环（Stage 0 – Stage 4）**：先 `how` + `why` + `architect` 定界（高风险分叉或连修卡死时调只读 [`agents/advisor.md`](./agents/advisor.md) 提供第二意见），再 `systematic-debugging` + `test-value` + `correct` 施工，推前过 `interrogate` 实证对抗与只读 [`agents/reviewer.md`](./agents/reviewer.md)（两者均绑定 `Gemini 4 Neon (High)`）四维盲审，推后跟进 `mergeStateStatus` 防跳过 CI 与 GraphQL `resolveReviewThread`。
 3. **开箱即用的 Antigravity 插件结构**：仓库根目录即完整插件包（[`plugin.json`](./plugin.json) + [`rules/AGENTS.md`](./rules/AGENTS.md) + [`agents/`](./agents) + 33 个扁平 [`skills/`](./skills)），直接克隆进插件目录即可生效。
 
 <div align="center">
@@ -69,7 +69,8 @@ bash scripts/install-skills.sh --target antigravity
 | **只读静态侦察** | `invoke_subagent(TypeName="research")` | 纯源码静态阅读与跨目录符号检索（无网络无终端沙盒），返回 `≤50` 行摘要附精确 `file:line`。 |
 | **只读 + CLI 考古/复现** | `invoke_subagent(TypeName="scout")`<br>（[`agents/scout.md`](./agents/scout.md)） | 仅授予 `read_file`、`run_command`、`manage_task`、`search_web`，物理剥离写工具；用于 `why`、`how` 与 Phase 1 失败复现。 |
 | **并行施工与分片流水线** | `invoke_subagent(TypeName="self", Workspace="share" \| "branch")`<br>`run_workflow` | 独立模块编码、回归测试与多语言包同步；单批并发 **≤5 路**，派发后等待系统唤醒，禁止循环轮询。 |
-| **推前独立四维盲审** | `swarm` (`gemini-4-carbon-high`)<br>回退：`invoke_subagent(TypeName="reviewer", Model="pro")` | 执行 [`agents/reviewer.md`](./agents/reviewer.md)：不传聊天历史，只读完整 `git diff` 与测试输出，过 4 维审校出 `PASS` 才准 push，结论后立即 `swarm kill`。 |
+| **技术顾问 / 方案参谋** | `swarm` (`gemini-4-neon-high`)<br>回退：`invoke_subagent(TypeName="advisor", Model="pro")` | 执行 [`agents/advisor.md`](./agents/advisor.md)：严格只读，提供架构权衡、高风险方案第二意见与卡死重规划，出结论后立即 `swarm kill`。 |
+| **推前独立四维盲审** | `swarm` (`gemini-4-neon-high`)<br>回退：`invoke_subagent(TypeName="reviewer", Model="pro")` | 执行 [`agents/reviewer.md`](./agents/reviewer.md)：不传聊天历史，只读完整 `git diff` 与测试输出，过 4 维审校出 `PASS` 才准 push，结论后立即 `swarm kill`。 |
 | **极端死锁单回合急救** | `claude-opus-5-5` | 连续两轮修复同一 Bug 失败后立即停手，切过去单回合外科定位根因。 |
 
 详细模型基准对照见 [2026-11 模型选型基准](./docs/benchmarks-2026-11.md)。
@@ -148,6 +149,7 @@ bash scripts/install-skills.sh --target antigravity
 ├── rules/
 │   └── AGENTS.md                      # 五阶段硬门禁全局规则（已脱敏）
 ├── agents/
+│   ├── advisor.md                     # 严格只读技术顾问与方案参谋代理
 │   ├── reviewer.md                    # 严格只读四维独立终审代理
 │   └── scout.md                       # 物理剥离写工具的只读 + CLI 侦察代理
 ├── skills/                            # 33 个扁平化 Antigravity 工程技能

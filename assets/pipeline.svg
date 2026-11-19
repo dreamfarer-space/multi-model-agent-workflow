@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="pipe-title pipe-desc">
   <title id="pipe-title">Five-Stage Hard-Gated Engineering and PR Pipeline</title>
-  <desc id="pipe-desc">Five sequential gated stages: Stage 0 Scope and Grounding (how, why, architect, grill-me), Stage 1 Locate and Implement (systematic-debugging, spike, test-value, simplify-codebase, correct), Stage 2 Local Gates and Independent Audit (interrogate, reviewer), Stage 3 Clean PR Delivery (yeet, github), and Stage 4 Post-Push CI and Review Loop (gh-fix-ci, gh-address-comments), with Two-Strike Reset.</desc>
+  <desc id="pipe-desc">Five sequential gated stages: Stage 0 Scope and Grounding (how, why, architect, grill-me, advisor), Stage 1 Locate and Implement (systematic-debugging, spike, test-value, simplify-codebase, correct), Stage 2 Local Gates and Independent Audit (interrogate, reviewer on Neon High), Stage 3 Clean PR Delivery (yeet, github), and Stage 4 Post-Push CI and Review Loop (gh-fix-ci, gh-address-comments), with Two-Strike Reset.</desc>
   <defs>
     <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 8 5 L 0 9 z" fill="#475569"/>
@@ -27,7 +27,7 @@
     <rect x="30" y="176" width="150" height="58" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
     <text x="38" y="194" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#2563eb">how / why</text>
     <text x="38" y="210" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#2563eb">architect / grill-me</text>
-    <text x="38" y="226" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">research / scout</text>
+    <text x="38" y="226" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">scout / advisor (Neon)</text>
   </g>
 
   <path d="M 190 137 L 208 137" fill="none" stroke="#475569" stroke-width="1.75" marker-end="url(#arr)"/>
@@ -53,14 +53,14 @@
     <rect x="400" y="24" width="170" height="226" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="1.75"/>
     <path d="M 400 34 Q 400 24 410 24 L 560 24 Q 570 24 570 34 L 570 56 L 400 56 Z" fill="#fffbeb"/>
     <text x="410" y="45" font-family="SFMono-Regular, Consolas, monospace" font-size="11.5" font-weight="700" fill="#b45309">STAGE 2 · 门禁与终审</text>
-    <text x="410" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="600" fill="#0f172a">对抗实证 + Carbon 盲审</text>
+    <text x="410" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="600" fill="#0f172a">对抗实证 + Neon 盲审</text>
     <text x="410" y="100" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">1. rebase + 重编 + 串行 check</text>
     <text x="410" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">2. interrogate 实跑击穿测试</text>
-    <text x="410" y="136" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">3. Carbon 只读 4 维终审</text>
+    <text x="410" y="136" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">3. Neon High 4 维终审</text>
     <text x="410" y="154" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11.5" fill="#334155">   (PASS 才准 push)</text>
     <rect x="410" y="176" width="150" height="58" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
     <text x="418" y="194" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#b45309">interrogate</text>
-    <text x="418" y="210" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#b45309">reviewer (Carbon High)</text>
+    <text x="418" y="210" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" font-weight="600" fill="#b45309">reviewer (Neon High)</text>
     <text x="418" y="226" font-family="SFMono-Regular, Consolas, monospace" font-size="10.5" fill="#64748b">statechart / break-ui</text>
   </g>
 

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="routing-title routing-desc">
   <title id="routing-title">Antigravity Multi-Model Role &amp; Permission Isolation Architecture</title>
-  <desc id="routing-desc">Antigravity native multi-model routing: Lead Gemini 4 Hydrogen (High) for Plan/Execute and coupled edits, sandboxed research and write-stripped scout for exploration, workspace-isolated self and run_workflow for parallel build/tests, Gemini 4 Carbon (High) via swarm for read-only pre-push blind review, and Claude Opus 5.5 for deadlock escalation.</desc>
+  <desc id="routing-desc">Antigravity native multi-model routing: Lead Gemini 4 Hydrogen (High) for Plan/Execute and coupled edits, sandboxed research and write-stripped scout for exploration, workspace-isolated self and run_workflow for parallel build/tests, Gemini 4 Neon (High) via swarm for read-only advisor &amp; pre-push blind review, and Claude Opus 5.5 for deadlock escalation.</desc>
   <defs>
     <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 8 5 L 0 9 z" fill="#3b82f6"/>
@@ -16,7 +16,7 @@
   <rect width="960" height="540" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
 
   <text x="32" y="36" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif" font-size="18" font-weight="700" fill="#0f172a">Antigravity 原生子智能体分工与权限隔离架构</text>
-  <text x="32" y="56" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif" font-size="12.5" fill="#64748b">主脑负责 Plan/Execute 与耦合核心，Scout 工具层物理禁写，Writer 用 share/branch 隔离，Carbon 盲审只读 diff。</text>
+  <text x="32" y="56" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif" font-size="12.5" fill="#64748b">主脑负责 Plan/Execute 与耦合核心，Scout 工具层物理禁写，Writer 用 share/branch 隔离，Neon High 担任只读顾问与盲审。</text>
 
   <g filter="url(#shadow)">
     <rect x="210" y="74" width="540" height="118" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
@@ -83,8 +83,8 @@
   <g filter="url(#shadow)">
     <rect x="28" y="438" width="904" height="82" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="1.75"/>
     <path d="M 28 448 Q 28 438 38 438 L 922 438 Q 932 438 932 448 L 932 468 L 28 468 Z" fill="#fffbeb"/>
-    <text x="44" y="458" font-family="SFMono-Regular, Consolas, monospace" font-size="12" font-weight="700" fill="#b45309">5. 推前独立四维终审 (swarm: gemini-4-carbon-high / reviewer)  &amp;  死锁急救 (Claude Opus 5.5)</text>
+    <text x="44" y="458" font-family="SFMono-Regular, Consolas, monospace" font-size="12" font-weight="700" fill="#b45309">5. 只读顾问与推前终审 (swarm: gemini-4-neon-high / advisor · reviewer)  &amp;  死锁急救 (Opus 5.5)</text>
     <text x="44" y="488" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#1e293b">• reviewer 终审（改动 ≥2 源码文件或状态机/权限/安全/IPC 必触发）：只读核查 ①边界/私货 ②安全/脱敏/竞态 ③test-value 鉴别力 ④废话注释与抑制标记</text>
-    <text x="44" y="508" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#64748b">• 出结论后立即 swarm kill 释放资源；主脑连修 2 轮不过则停手重置或切 Opus 5.5 单回合定位根因</text>
+    <text x="44" y="508" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" fill="#64748b">• advisor 负责架构选型与卡死二选一；出结论后立即 swarm kill 释放资源；主脑连修 2 轮不过则停手重置或切 Opus 5.5 单回合定位根因</text>
   </g>
 </svg>

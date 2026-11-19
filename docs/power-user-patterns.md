@@ -1,6 +1,6 @@
 # Antigravity 多模型工程工作流与五阶段硬门禁精粹
 
-本文沉淀本插件（`rules/AGENTS.md` + `agents/{scout,reviewer}.md` + 33 个 `skills/`）背后的工程设计原则：**不靠“求模型别犯错”，而是靠工具权限物理剥离、独立工作区隔离、五阶段硬门禁与静态检查，把 AI 协作跑稳。**
+本文沉淀本插件（`rules/AGENTS.md` + `agents/{scout,advisor,reviewer}.md` + 33 个 `skills/`）背后的工程设计原则：**不靠“求模型别犯错”，而是靠工具权限物理剥离、独立工作区隔离、五阶段硬门禁与静态检查，把 AI 协作跑稳。**
 
 ---
 
@@ -30,7 +30,7 @@
 1. **同步基线与全量本地验证**：先 `git fetch && git rebase` 对齐上游基线、重编受影响产物，再**串行**跑通目标仓库 `check` / `typecheck` / `lint` / 受影响测试（严禁多个构建或原生 prebuild 并发争抢）。
 2. **实证对抗探测（`interrogate`）**：高风险并发、权限、协议或状态机改动，派出 `invoke_subagent(TypeName="self", Workspace="branch"|"share")` 对抗侦察尝试击穿改动——**只有真实执行命令或复现脚本跑出来的失败才算数**，无执行证据的猜测一律丢弃。
 3. **强制推前独立四维终审（`reviewer`）**：
-   - 凡改动 **≥2 个源码文件**，或涉及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 或开 PR 前**必须**由独立只读 `reviewer`（`swarm` `gemini-4-carbon-high` 或 `invoke_subagent(TypeName="reviewer", Model="pro")`）审查，输入**仅限需求边界 + 完整 `git diff` + 本地测试输出**（不传对话历史）：
+   - 凡改动 **≥2 个源码文件**，或涉及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 或开 PR 前**必须**由独立只读 `reviewer`（`swarm` `gemini-4-neon-high` 或 `invoke_subagent(TypeName="reviewer", Model="pro")`）审查，输入**仅限需求边界 + 完整 `git diff` + 本地测试输出**（不传对话历史）：
      1. **边界与私货（Scope Drift）**：是否偷渡未要求的新功能、多余开关或顺手重构；
      2. **安全、脱敏与并发边界**：信任边界、路径/符号链接逃逸、密钥/个人路径脱敏、竞态与测试禁用检查；
      3. **测试鉴别力（`test-value`）**：断言是否真正绑定可观测行为，而非纯 mock 走过场；

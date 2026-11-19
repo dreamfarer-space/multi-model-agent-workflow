@@ -12,7 +12,8 @@
   - 需执行 `git log`、`gh`、最小失败复现或只读诊断命令的勘察：调用 `invoke_subagent(TypeName="scout", Role="...", Prompt="...")`（仅授予 `read_file`、`run_command`、`manage_task`、`search_web`，工具层物理剥离写文件权限）。
 - **独立模块施工与并行验证（`self` / `run_workflow`）**：独立模块编码、回归测试编写（遵循 `test-value`）与多语言包同步优先调用 `invoke_subagent(TypeName="self", Role="...", Prompt="...", Workspace="inherit"|"share"|"branch")`（共享仓库并行改动时使用 `Workspace="share"` 或 `"branch"` 隔离；单批并发 ≤5 路；多阶段或大规模分片流水线使用 `run_workflow`）。每次派发必须写明目录/文件收敛边界与返回契约（≤25 次工具调用、≤8 个目标文件、≤50 行摘要附 `file:line` 真实证据），禁止全仓盲目遍历或主会话单枪匹马连续超过 30 次文件读写。
 - **禁止空转轮询与轻量调研滥用 `swarm`**：派发 `invoke_subagent`、后台 `run_command` 或 `swarm` 后直接结束本轮等待系统唤醒，严禁循环调用 `manage_task("list"/"status")`、`manage_subagents("list")` 或连续 `schedule` 轮询；轻量只读调研一律使用 `research`/`scout`，不要为只读检索拉起多成员 `swarm`。
-- **推前独立终审（`reviewer`）**：优先通过 `swarm(action="add", name="reviewer", model="gemini-4-carbon-high", workspace="inherit", brief=...)` 启动单名只读审校员（不建 `monitor`，严格执行 `agents/reviewer.md` 4 维审校且严禁写文件，出结论后即 `swarm(action="kill", name="reviewer")`）；仅当 `swarm` 或对应模型不可用/受限时退回 `invoke_subagent(TypeName="reviewer", Role="Independent Pre-Push Reviewer", Model="pro", Prompt="...")`。
+- **技术顾问 / 方案参谋（`advisor`）**：遇到非平凡架构选型、高风险状态机/协议/并发方案第二意见、或同一问题连续两轮修复未生效需重新定界时，优先通过 `swarm(action="add", name="advisor", model="gemini-4-neon-high", workspace="inherit", brief=...)` 启动单名只读顾问（不建 `monitor`，严格执行 `agents/advisor.md` 约束且严禁写文件，出结论后即 `swarm(action="kill", name="advisor")`）；仅当 `swarm` 或对应模型不可用/受限时退回 `invoke_subagent(TypeName="advisor", Role="Technical Advisor", Model="pro", Prompt="...")`。
+- **推前独立终审（`reviewer`）**：优先通过 `swarm(action="add", name="reviewer", model="gemini-4-neon-high", workspace="inherit", brief=...)` 启动单名只读审校员（不建 `monitor`，严格执行 `agents/reviewer.md` 4 维审校且严禁写文件，出结论后即 `swarm(action="kill", name="reviewer")`）；仅当 `swarm` 或对应模型不可用/受限时退回 `invoke_subagent(TypeName="reviewer", Role="Independent Pre-Push Reviewer", Model="pro", Prompt="...")`。
 - **极端死锁单回合急救**：连续 2 轮修复同一问题仍未通过时立即停手，记录已证伪假设并重新规划或单回合切换至 `claude-opus-5-5` 定点排查。
 
 ## 3. 开发与 PR 强制工作流（5 阶段硬卡点）
@@ -26,7 +27,7 @@
    - 安全敏感或跨边界改动对照 `security-best-practices`；大块结构精简用 `simplify-codebase`；遇反复犯的同类错时用 **`correct`** 按“架构 → 类型 → Lint → 行为测试 → 文档”最高有效层级固化防呆；跨模块排查或独立子任务优先用 `invoke_subagent`（`research` / `scout` / `self`），不超过 5 路并发。
 3. **阶段 2 · 本地门禁与独立审核（Push 前硬闸门）**：
    - 先完成上游基线同步（`git fetch && git rebase`）与产物重编，再串行跑通目标仓库本地门禁与受影响测试；高风险并发/权限/协议改动加跑 **`interrogate`** 做实证破坏测试。
-   - **强制独立审核**：凡改动 **≥2 个源码文件** 或涉及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 或建 PR 前**必须**执行独立终审（优先 `swarm` `gemini-4-carbon-high` 单审校员，不可用时退回 `invoke_subagent(TypeName="reviewer", Model="pro")`），传入需求边界、完整 `git diff` 与本地测试输出，核查：**① 是否偏离维护者/用户边界（未擅自加功能或扩散改动面） ② 安全、脱敏、竞态与边界漏洞 ③ 是否残留废话注释、注释死代码或无正当外因的 `@ts-ignore` / `@ts-expect-error` / `eslint-disable` 绕过标记**。未过审不得 push；任何 rebase 或审核后改动必须重跑受影响检查并复审。
+   - **强制独立审核**：凡改动 **≥2 个源码文件** 或涉及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 或建 PR 前**必须**执行独立终审（优先 `swarm` `gemini-4-neon-high` 单审校员，不可用时退回 `invoke_subagent(TypeName="reviewer", Model="pro")`），传入需求边界、完整 `git diff` 与本地测试输出，核查：**① 是否偏离维护者/用户边界（未擅自加功能或扩散改动面） ② 安全、脱敏、竞态与边界漏洞 ③ 是否残留废话注释、注释死代码或无正当外因的 `@ts-ignore` / `@ts-expect-error` / `eslint-disable` 绕过标记**。未过审不得 push；任何 rebase 或审核后改动必须重跑受影响检查并复审。
 4. **阶段 3 · 规范提 PR**：
    - 若目标仓库有专属贡献/PR 规范（`CONTRIBUTING.md`、`AGENTS.md` 或专用 Skill）优先遵守；其余仓库走 **`yeet`**（通用 issue/仓库/release/auth 查 **`github`**）。
    - 通用红线：仓库 `user.email` 保持一致；匹配目标仓库主要语言；严禁添加 AI `Co-Authored-By`；严禁擅自触发自动审查机器人；PR 正文一律写**无 BOM UTF-8** 临时文件并用 `--body-file` 提交。

@@ -7,7 +7,7 @@
 [![Works with](https://img.shields.io/badge/Works%20with-Google%20Antigravity-orange.svg?style=flat-square)](#quickstart)
 [![Language](https://img.shields.io/badge/Language-English%20%7C%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-lightgrey.svg?style=flat-square)](./README.md)
 
-<p>A native <b>Google Antigravity</b> engineering workflow plugin: 5-stage hard gates, write-stripped scout &amp; reviewer subagents, Carbon blind audit, and 33 curated skills.</p>
+<p>A native <b>Google Antigravity</b> engineering workflow plugin: 5-stage hard gates, write-stripped scout / advisor / reviewer subagents, Neon High advisor &amp; blind audit, and 33 curated skills.</p>
 
 **English** · [简体中文](./README.md) · [Model Benchmarks](./docs/benchmarks-2026-11.md) · [Engineering Patterns](./docs/power-user-patterns.md) · [Legacy Hermes Archive](./docs/legacy-hermes.md)
 
@@ -23,7 +23,7 @@ Second, self-review suffers from confirmation bias: the same model and chat thre
 
 This repository packages the constraints directly into Antigravity's native plugin structure:
 1. **Tool-level role & workspace isolation**: The lead model (`Gemini 4 Hydrogen (High)`) owns planning and coupled core edits; [`agents/scout.md`](./agents/scout.md) strips `edit_file` / `write_file` tools for bounded read-only CLI archaeology and reproduction; parallel writers run inside isolated `share` / `branch` workspaces or `run_workflow` (capped at ≤5 concurrent), and the main thread never runs >30 solo read/edit steps.
-2. **5-stage hard-gated pipeline (Stage 0 – Stage 4)**: Ground with `how` + `why` + `architect` before editing; build with `systematic-debugging`, `test-value`, and `correct`; verify before push with `interrogate` (command-proven findings only) and a strictly read-only [`agents/reviewer.md`](./agents/reviewer.md) (`Gemini 4 Carbon (High)`) auditing four mandatory dimensions; close CI with `mergeStateStatus` checks and GraphQL `resolveReviewThread`.
+2. **5-stage hard-gated pipeline (Stage 0 – Stage 4)**: Ground with `how` + `why` + `architect` before editing (consult read-only [`agents/advisor.md`](./agents/advisor.md) on non-trivial architectural forks or deadlocks); build with `systematic-debugging`, `test-value`, and `correct`; verify before push with `interrogate` (command-proven findings only) and a strictly read-only [`agents/reviewer.md`](./agents/reviewer.md) (both pinned to `Gemini 4 Neon (High)`) auditing four mandatory dimensions; close CI with `mergeStateStatus` checks and GraphQL `resolveReviewThread`.
 3. **Ready-to-use Antigravity plugin layout**: The repository root itself is a valid plugin (`plugin.json` + `rules/AGENTS.md` + `agents/` + 33 flat `skills/`).
 
 <div align="center">
@@ -67,7 +67,8 @@ bash scripts/install-skills.sh --target antigravity
 | **Static Read-Only Scout** | `invoke_subagent(TypeName="research")` | Pure static file reading and cross-directory symbol lookup (no network, no terminal); returns `≤50` lines with `file:line` citations. |
 | **Read-Only + CLI Scout** | `invoke_subagent(TypeName="scout")`<br>([`agents/scout.md`](./agents/scout.md)) | Grants `read_file`, `run_command`, `manage_task`, `search_web` with write tools physically omitted; runs `why`, `how`, and Phase 1 bug reproductions. |
 | **Parallel Build & Verification** | `invoke_subagent(TypeName="self", Workspace="share" \| "branch")`<br>`run_workflow` | Independent modules, regression tests, and staged Python workflows (**≤5 concurrent**); waits on system wakeup instead of polling loops. |
-| **Pre-Push 4-Dimension Blind Audit** | `swarm` (`gemini-4-carbon-high`)<br>Fallback: `invoke_subagent(TypeName="reviewer", Model="pro")` | Runs [`agents/reviewer.md`](./agents/reviewer.md) with no chat history — receives only scope, full `git diff`, and test outputs; kills worker immediately after verdict. |
+| **Technical Advisor** | `swarm` (`gemini-4-neon-high`)<br>Fallback: `invoke_subagent(TypeName="advisor", Model="pro")` | Runs [`agents/advisor.md`](./agents/advisor.md) strictly read-only for architectural trade-offs, high-risk second opinions, and deadlock reframing; kills worker immediately after advice. |
+| **Pre-Push 4-Dimension Blind Audit** | `swarm` (`gemini-4-neon-high`)<br>Fallback: `invoke_subagent(TypeName="reviewer", Model="pro")` | Runs [`agents/reviewer.md`](./agents/reviewer.md) with no chat history — receives only scope, full `git diff`, and test outputs; kills worker immediately after verdict. |
 | **Deadlock Escalation** | `claude-opus-5-5` | Single-turn surgical escalation if two consecutive fix attempts fail. |
 
 See [Model Benchmarks (2026-11)](./docs/benchmarks-2026-11.md) for measured metrics and role rationale.
@@ -146,6 +147,7 @@ All skills live flat under [`skills/`](./skills). See [`THIRD_PARTY_NOTICES.md`]
 ├── rules/
 │   └── AGENTS.md                      # 5-stage hard-gated workflow rules (sanitized)
 ├── agents/
+│   ├── advisor.md                     # Strictly read-only technical advisor
 │   ├── reviewer.md                    # Strictly read-only 4-dimension auditor
 │   └── scout.md                       # Write-stripped read-only + CLI scout
 ├── skills/                            # 33 flat Antigravity engineering skills
