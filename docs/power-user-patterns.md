@@ -1,10 +1,14 @@
 # Antigravity 多模型工程工作流与五阶段硬门禁精粹
 
-本文沉淀本插件（`rules/AGENTS.md` + `agents/{scout,advisor,reviewer}.md` + 33 个 `skills/`）背后的工程设计原则：**不靠“求模型别犯错”，而是靠工具权限物理剥离、独立工作区隔离、五阶段硬门禁与静态检查，把 AI 协作跑稳。**
+本文沉淀本插件（`rules/AGENTS.md` + `hooks.json` + `agents/{scout,advisor,reviewer}.md` + 33 个 `skills/`）背后的工程设计原则：**不靠“求模型别犯错”，而是靠 `PreToolUse` 硬拦截 Hook、工具权限物理剥离、独立工作区隔离、S/M/L 分级五阶段硬门禁与静态校验脚本，把 AI 协作跑稳。**
 
 ---
 
-## 一、五阶段硬门禁工程流（Stage 0 – Stage 4）
+## 一、S/M/L 分级快车道与五阶段硬门禁（Stage 0 – Stage 4）
+
+- **S 级（单文件文档/配置/拼写，无逻辑与安全面）**：免 `worktree`（个人仓允许当前分支直改）、免 `architect`/`interrogate`/`reviewer`，跑最简格式/语法校验即可。
+- **M 级（常规 Bug/单包小功能，2–5 文件）**：独立 `worktree` + 最小复现 + 局部检查 + `reviewer` 终审。
+- **L 级（跨模块/状态机/权限/安全/协议/IPC/UI 改版）**：走满下列 Stage 0–4 全链路。
 
 ### Stage 0 · 接单立界（Scope & Grounding）
 1. **Worktree 基线隔离**：先核对目标仓库 `AGENTS.md` / `CONTRIBUTING.md`、当前分支与 `upstream/main`（或 `origin/main`）基线；**禁止直接在主工作区切开发分支**，新建独立 `git worktree` 或用 `Workspace="branch"` / `"share"` 再动手。
@@ -30,7 +34,7 @@
 1. **同步基线与全量本地验证**：先 `git fetch && git rebase` 对齐上游基线、重编受影响产物，再**串行**跑通目标仓库 `check` / `typecheck` / `lint` / 受影响测试（严禁多个构建或原生 prebuild 并发争抢）。
 2. **实证对抗探测（`interrogate`）**：高风险并发、权限、协议或状态机改动，派出 `invoke_subagent(TypeName="self", Workspace="branch"|"share")` 对抗侦察尝试击穿改动——**只有真实执行命令或复现脚本跑出来的失败才算数**，无执行证据的猜测一律丢弃。
 3. **强制推前独立四维终审（`reviewer`）**：
-   - 凡改动 **≥2 个源码文件**，或涉及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 或开 PR 前**必须**由独立只读 `reviewer`（`swarm` `gemini-4-neon-high` 或 `invoke_subagent(TypeName="reviewer", Model="pro")`）审查，输入**仅限需求边界 + 完整 `git diff` + 本地测试输出**（不传对话历史）：
+   - 凡改动 **≥2 个源码文件**，或涉及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 或开 PR 前**必须**由独立只读 `reviewer`（默认 `swarm` `gemini-4-neon-high`，主脑本身为 Neon High 的高风险改动切异构模型如 `claude-opus-5-5-high`；`brief` 首行必须显式要求先 `read_file` `agents/reviewer.md`；不可用时退回 `invoke_subagent(TypeName="reviewer", Model="pro")`）审查，输入**仅限需求边界 + 完整 `git diff` + 本地测试输出**（不传对话历史）：
      1. **边界与私货（Scope Drift）**：是否偷渡未要求的新功能、多余开关或顺手重构；
      2. **安全、脱敏与并发边界**：信任边界、路径/符号链接逃逸、密钥/个人路径脱敏、竞态与测试禁用检查；
      3. **测试鉴别力（`test-value`）**：断言是否真正绑定可观测行为，而非纯 mock 走过场；
@@ -39,7 +43,7 @@
 
 ### Stage 3 · 规范提 PR（PR Creation Discipline）
 - 优先遵守目标仓库 `AGENTS.md` / `CONTRIBUTING.md`（例如 DCO `git commit -s`、模板分段、资产隔离分支）；通用仓库使用 **`yeet`** 与 **`github`**。
-- **通用红线**：保持仓库 `user.email` 一致；PR 标题与正文语言匹配目标仓库主语言；**严禁添加 AI `Co-Auth-By`**；**严禁擅自触发自动 review bot**；PR 正文一律写为**无 BOM 的 UTF-8** 临时文件再传 `--body-file`。
+- **通用红线（`hooks.json` + `scripts/guard-hook.mjs` `PreToolUse` 硬拦截）**：保持仓库 `user.email` 一致；PR 标题与正文语言匹配目标仓库主语言；**严禁添加 AI `Co-Authored-By`**；**严禁擅自触发 `@codex review` 等自动 review bot**；**严禁裸 `git push --force`/`-f`**；PR 正文一律写为**无 BOM 的 UTF-8** 临时文件再传 `--body-file`（本地可选配 `.privacy-denylist.json` 拦截敏感标识外泄）。
 - **隐私与媒体红线**：调试/验收截图严禁提交进源码主干或 Issue（仅作 PR 描述原生附件或推至仓库隔离资产分支），上传前确认无本机用户名、个人绝对路径、Token 或未脱敏二维码。
 
 ### Stage 4 · 推后巡检与评论闭环（Post-Push CI & Review Loop）

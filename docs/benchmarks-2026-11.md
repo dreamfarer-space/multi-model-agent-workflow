@@ -27,8 +27,8 @@
 
 1. **主脑与日常执行统一走 `Gemini 4 Hydrogen (High)`**（`gemini-4-hydrogen-high`）：
    - 负责 Plan / Execute 双阶段统筹、两版架构骨架设计（`architect`）、核心耦合改动，以及 `research` / `scout` / `self` 子智能体执行，减少跨模型上下文切换摩擦。
-2. **技术顾问（`advisor`）与推前独立终审（`reviewer`）统一走 `Gemini 4 Neon (High)`**（`gemini-4-neon-high`）：
-   - `advisor`：通过 `swarm` 挂载 `agents/advisor.md`（不建 `monitor`，出结论即销毁；不可用时退回 `invoke_subagent(TypeName="advisor", Model="pro")`），在架构分叉、高风险协议/并发设计或卡死重规划时提供只读第二意见。
-   - `reviewer`：通过 `swarm` 挂载 `agents/reviewer.md`（不建 `monitor`，出结论即销毁；不可用时退回 `invoke_subagent(TypeName="reviewer", Model="pro")`），只传入需求边界、`git diff` 与测试输出，在零聊天上下文干扰下完成 4 维审校。
+2. **技术顾问（`advisor`）与推前独立终审（`reviewer`）默认走 `Gemini 4 Neon (High)`**（`gemini-4-neon-high`，支持同源异构兜底）：
+   - `advisor`：通过 `swarm` 启动并要求首行先 `read_file` `agents/advisor.md`（不建 `monitor`，出结论即销毁；不可用时退回 `invoke_subagent(TypeName="advisor", Model="pro")`），在架构分叉、高风险协议/并发设计或卡死重规划时提供只读第二意见。
+   - `reviewer`：通过 `swarm` 启动并要求首行先 `read_file` `agents/reviewer.md`（不建 `monitor`，出结论即销毁；若当前主会话本身运行在 `Gemini 4 Neon (High)` 且属高风险并发/安全/架构大改，终审切换异构模型如 `claude-opus-5-5-high` 或 `gemini-4-hydrogen-high`；不可用时退回 `invoke_subagent(TypeName="reviewer", Model="pro")`），只传入需求边界、`git diff` 与测试输出，在零聊天上下文干扰下完成 4 维审校。
 3. **死锁急救锁定 `Claude Opus 5.5`（`high`/`medium`）**：
    - CodeRabbit 在 Signal 真实 PR 集上测得 Opus 5.5 能抓出 **76.9%（10/13）** 的隐蔽并发竞态缺陷，但 `xhigh` 档容易把 128K 输出全耗在思考上。因此不挂在主窗口长跑，仅在两轮修复失败后作单回合根因急救。

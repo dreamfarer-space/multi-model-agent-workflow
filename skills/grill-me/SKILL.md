@@ -28,7 +28,7 @@ mechanic from mattpocock/skills' `grilling`.
 - A plan has unresolved decisions or seems vague
 - Before breaking complex work into `invoke_subagent` / `run_workflow` tasks
 
-Do NOT use for existing code (use `invoke_subagent(TypeName="reviewer", ...)` / `simplify-codebase`) or simple one-off
+Do NOT use for existing code (use `reviewer` per `AGENTS.md` Section 2 / `simplify-codebase`) or simple one-off
 tasks.
 
 ## Prerequisites

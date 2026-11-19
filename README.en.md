@@ -22,9 +22,9 @@ First, mixing reconnaissance and coupled edits in one thread burns flagship cont
 Second, self-review suffers from confirmation bias: the same model and chat thread that wrote a patch routinely overlooks skipped requirements, unrequested scope additions, and hollow mock tests.
 
 This repository packages the constraints directly into Antigravity's native plugin structure:
-1. **Tool-level role & workspace isolation**: The lead model (`Gemini 4 Hydrogen (High)`) owns planning and coupled core edits; [`agents/scout.md`](./agents/scout.md) strips `edit_file` / `write_file` tools for bounded read-only CLI archaeology and reproduction; parallel writers run inside isolated `share` / `branch` workspaces or `run_workflow` (capped at ≤5 concurrent), and the main thread never runs >30 solo read/edit steps.
-2. **5-stage hard-gated pipeline (Stage 0 – Stage 4)**: Ground with `how` + `why` + `architect` before editing (consult read-only [`agents/advisor.md`](./agents/advisor.md) on non-trivial architectural forks or deadlocks); build with `systematic-debugging`, `test-value`, and `correct`; verify before push with `interrogate` (command-proven findings only) and a strictly read-only [`agents/reviewer.md`](./agents/reviewer.md) (both pinned to `Gemini 4 Neon (High)`) auditing four mandatory dimensions; close CI with `mergeStateStatus` checks and GraphQL `resolveReviewThread`.
-3. **Ready-to-use Antigravity plugin layout**: The repository root itself is a valid plugin (`plugin.json` + `rules/AGENTS.md` + `agents/` + 33 flat `skills/`).
+1. **Tool-level isolation & `PreToolUse` hard hooks**: The lead model (`Gemini 4 Hydrogen (High)`) owns planning and coupled core edits; [`agents/scout.md`](./agents/scout.md) physically strips `edit_file` / `write_file`; root [`hooks.json`](./hooks.json) + [`scripts/guard-hook.mjs`](./scripts/guard-hook.mjs) hard-block AI `Co-Authored-By`, `@codex review`, bare `git push --force`, UTF-8 BOM `--body-file`, and `node:vm`/`eval`/`new Function` in tests before execution.
+2. **S/M/L task tiering + 5-stage hard-gated pipeline (Stage 0 – Stage 4)**: Single-file docs/config tweaks take the S-tier fast lane; M/L work runs the full gate — ground with `how` + `why` + `architect` (consult read-only [`agents/advisor.md`](./agents/advisor.md) on forks/deadlocks), build with `systematic-debugging` + `test-value` + `correct`, verify before push with `interrogate` and read-only [`agents/reviewer.md`](./agents/reviewer.md) (pinned to `Gemini 4 Neon (High)`, switching to a heterogeneous model such as `claude-opus-5-5-high` when the lead session itself is Neon High on high-risk edits).
+3. **Ready-to-use plugin + automated verification/sync**: The repository root is a valid plugin (`plugin.json` + `hooks.json` + `rules/AGENTS.md` + `agents/` + 33 flat `skills/`), backed by cross-platform [`scripts/verify-plugin.mjs`](./scripts/verify-plugin.mjs) and non-destructive [`scripts/sync-workflow.mjs`](./scripts/sync-workflow.mjs).
 
 <div align="center">
   <img src="./assets/model-routing.svg" alt="Antigravity native subagent isolation architecture" width="100%">
@@ -46,8 +46,14 @@ git clone https://github.com/dreamfarer-space/multi-model-agent-workflow.git ~/.
 git clone https://github.com/dreamfarer-space/multi-model-agent-workflow.git
 cd multi-model-agent-workflow
 
-# Install full Antigravity plugin (plugin.json + agents/ + rules/AGENTS.md + 33 skills)
+# Install full Antigravity plugin (preserves existing local rules/AGENTS.md unless FORCE_RULES=1)
 bash scripts/install-skills.sh --target antigravity
+
+# Or use cross-platform Node sync (works on Windows PowerShell, preserves local private rules)
+node scripts/sync-workflow.mjs --to-local
+
+# Run automated plugin, SVG bounds, sanitization, and guard-hook behavioral checks
+node scripts/verify-plugin.mjs
 
 # Or export the 33 flat skills to another skill directory:
 # bash scripts/install-skills.sh --target claude   # ~/.claude/skills
@@ -67,8 +73,8 @@ bash scripts/install-skills.sh --target antigravity
 | **Static Read-Only Scout** | `invoke_subagent(TypeName="research")` | Pure static file reading and cross-directory symbol lookup (no network, no terminal); returns `≤50` lines with `file:line` citations. |
 | **Read-Only + CLI Scout** | `invoke_subagent(TypeName="scout")`<br>([`agents/scout.md`](./agents/scout.md)) | Grants `read_file`, `run_command`, `manage_task`, `search_web` with write tools physically omitted; runs `why`, `how`, and Phase 1 bug reproductions. |
 | **Parallel Build & Verification** | `invoke_subagent(TypeName="self", Workspace="share" \| "branch")`<br>`run_workflow` | Independent modules, regression tests, and staged Python workflows (**≤5 concurrent**); waits on system wakeup instead of polling loops. |
-| **Technical Advisor** | `swarm` (`gemini-4-neon-high`)<br>Fallback: `invoke_subagent(TypeName="advisor", Model="pro")` | Runs [`agents/advisor.md`](./agents/advisor.md) strictly read-only for architectural trade-offs, high-risk second opinions, and deadlock reframing; kills worker immediately after advice. |
-| **Pre-Push 4-Dimension Blind Audit** | `swarm` (`gemini-4-neon-high`)<br>Fallback: `invoke_subagent(TypeName="reviewer", Model="pro")` | Runs [`agents/reviewer.md`](./agents/reviewer.md) with no chat history — receives only scope, full `git diff`, and test outputs; kills worker immediately after verdict. |
+| **Technical Advisor** | `swarm` (`gemini-4-neon-high`)<br>Fallback: `invoke_subagent(TypeName="advisor", Model="pro")` | Brief must instruct `read_file` [`agents/advisor.md`](./agents/advisor.md) first: strictly read-only architectural trade-offs, high-risk second opinions, and deadlock reframing; kills worker immediately after advice. |
+| **Pre-Push 4-Dimension Blind Audit** | `swarm` (`gemini-4-neon-high`; switches to a heterogeneous model e.g. `claude-opus-5-5-high` when lead is Neon High on high-risk edits)<br>Fallback: `invoke_subagent(TypeName="reviewer", Model="pro")` | Brief must instruct `read_file` [`agents/reviewer.md`](./agents/reviewer.md) first: no chat history — receives only scope, full `git diff`, and test outputs; kills worker immediately after verdict. |
 | **Deadlock Escalation** | `claude-opus-5-5` | Single-turn surgical escalation if two consecutive fix attempts fail. |
 
 See [Model Benchmarks (2026-11)](./docs/benchmarks-2026-11.md) for measured metrics and role rationale.
@@ -144,8 +150,9 @@ All skills live flat under [`skills/`](./skills). See [`THIRD_PARTY_NOTICES.md`]
 ```text
 .
 ├── plugin.json                        # Antigravity plugin manifest
+├── hooks.json                         # PreToolUse hard-guardrail hooks
 ├── rules/
-│   └── AGENTS.md                      # 5-stage hard-gated workflow rules (sanitized)
+│   └── AGENTS.md                      # S/M/L tiering + 5-stage hard-gated workflow rules (sanitized)
 ├── agents/
 │   ├── advisor.md                     # Strictly read-only technical advisor
 │   ├── reviewer.md                    # Strictly read-only 4-dimension auditor
@@ -161,6 +168,9 @@ All skills live flat under [`skills/`](./skills). See [`THIRD_PARTY_NOTICES.md`]
 │   ├── why/
 │   └── ...
 ├── scripts/
+│   ├── guard-hook.mjs                 # PreToolUse redline blocker (supports optional .privacy-denylist.json)
+│   ├── verify-plugin.mjs              # Manifest, frontmatter, SVG bounds, sanitization & hook self-tests
+│   ├── sync-workflow.mjs              # Cross-platform whitelist sync (preserves local private rules)
 │   └── install-skills.sh              # Installer (Antigravity / Claude / Cursor / .agents / Hermes)
 ├── docs/
 │   ├── benchmarks-2026-11.md          # Benchmarks & model role rationale

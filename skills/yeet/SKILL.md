@@ -10,7 +10,7 @@ description: "Use only when the user explicitly asks to stage, commit, push, and
   - Match the repository's primary language (Chinese for Chinese repos, English for English repos).
   - Never add AI `Co-Authored-By` trailers; never trigger automated review bots unless requested.
   - Write `--body-file` in UTF-8 **without BOM (`U+FEFF`)** (use Node `fs.writeFileSync(p, text.replace(/^\uFEFF/, ''), 'utf8')`).
-  - Before creating/updating PRs, complete required local checks and independent review via `invoke_subagent(TypeName="reviewer")` when changing ≥2 source files or non-trivial logic.
+  - Before creating/updating PRs, complete required local checks and independent `reviewer` audit (following `AGENTS.md` Section 2 routing) when changing ≥2 source files or non-trivial logic.
   - After pushing, immediately inspect `gh pr view --json mergeStateStatus` and `gh pr checks` (`DIRTY` skips CI and must be rebased immediately).
 
 ## Prerequisites

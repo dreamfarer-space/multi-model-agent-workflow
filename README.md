@@ -22,9 +22,9 @@
 二是**同源模型自改自审**。写代码的模型和对话线程自己点通过，往往看不到漏做的边界、私货改动，或者只测了 mock 的空壳单测。
 
 这个插件仓库直接把约束做进 Antigravity 的原生结构里：
-1. **工具层物理隔离与子智能体边界**：主脑（`Gemini 4 Hydrogen (High)`）只管方案定稿与耦合核心；[`agents/scout.md`](./agents/scout.md) 物理剥离 `edit_file` / `write_file` 权限，专职 `git`/`gh` 考古与复现；独立施工使用 `Workspace="share" | "branch"` 隔离或 `run_workflow`，严禁主脑单枪匹马连续超过 30 次文件读写。
-2. **五阶段硬门禁闭环（Stage 0 – Stage 4）**：先 `how` + `why` + `architect` 定界（高风险分叉或连修卡死时调只读 [`agents/advisor.md`](./agents/advisor.md) 提供第二意见），再 `systematic-debugging` + `test-value` + `correct` 施工，推前过 `interrogate` 实证对抗与只读 [`agents/reviewer.md`](./agents/reviewer.md)（两者均绑定 `Gemini 4 Neon (High)`）四维盲审，推后跟进 `mergeStateStatus` 防跳过 CI 与 GraphQL `resolveReviewThread`。
-3. **开箱即用的 Antigravity 插件结构**：仓库根目录即完整插件包（[`plugin.json`](./plugin.json) + [`rules/AGENTS.md`](./rules/AGENTS.md) + [`agents/`](./agents) + 33 个扁平 [`skills/`](./skills)），直接克隆进插件目录即可生效。
+1. **工具层物理隔离与 `PreToolUse` 硬拦截**：主脑（`Gemini 4 Hydrogen (High)`）只管方案定稿与耦合核心；[`agents/scout.md`](./agents/scout.md) 物理剥离 `edit_file` / `write_file` 权限；根目录 [`hooks.json`](./hooks.json) + [`scripts/guard-hook.mjs`](./scripts/guard-hook.mjs) 在 `PreToolUse` 硬拦截 `Co-Authored-By`、`@codex review`、裸 `git push --force`、`--body-file` UTF-8 BOM 及测试内 `node:vm`/`eval`/`new Function`。
+2. **S/M/L 分级快车道 + 五阶段硬门禁（Stage 0 – Stage 4）**：单文件文案/配置走 S 级免仪式快车道；中大型改动走全套门禁——先 `how` + `why` + `architect` 定界（高风险分叉或连修卡死调只读 [`agents/advisor.md`](./agents/advisor.md)），再 `systematic-debugging` + `test-value` + `correct` 施工，推前过 `interrogate` 实证对抗与只读 [`agents/reviewer.md`](./agents/reviewer.md)（默认绑定 `Gemini 4 Neon (High)`；主会话同为 Neon High 且属高风险改动时自动切异构模型）。
+3. **开箱即用与自动校验/同步**：仓库根目录即完整插件包（[`plugin.json`](./plugin.json) + [`hooks.json`](./hooks.json) + [`rules/AGENTS.md`](./rules/AGENTS.md) + [`agents/`](./agents) + 33 个扁平 [`skills/`](./skills)），附带跨平台校验 [`scripts/verify-plugin.mjs`](./scripts/verify-plugin.mjs) 与不覆盖本地私有规则的双向同步 [`scripts/sync-workflow.mjs`](./scripts/sync-workflow.mjs)。
 
 <div align="center">
   <img src="./assets/model-routing.svg" alt="Antigravity 原生子智能体分工与权限隔离架构" width="100%">
@@ -48,8 +48,14 @@ git clone https://github.com/dreamfarer-space/multi-model-agent-workflow.git ~/.
 git clone https://github.com/dreamfarer-space/multi-model-agent-workflow.git
 cd multi-model-agent-workflow
 
-# 安装完整 Antigravity 插件（plugin.json + agents/ + rules/AGENTS.md + 33 个 skills/）
+# 安装完整 Antigravity 插件（默认保留本地已有 rules/AGENTS.md，设 FORCE_RULES=1 可覆盖）
 bash scripts/install-skills.sh --target antigravity
+
+# 或使用跨平台 Node 脚本同步核心文件与 33 个公共技能（兼容 Windows PowerShell，绝不覆盖私有规则）
+node scripts/sync-workflow.mjs --to-local
+
+# 运行插件完整性、SVG 边界、脱敏与 Hook 行为自检
+node scripts/verify-plugin.mjs
 
 # 如需同时将 33 个扁平 Skill 同步到其他代理目录：
 # bash scripts/install-skills.sh --target claude   # ~/.claude/skills
@@ -69,8 +75,8 @@ bash scripts/install-skills.sh --target antigravity
 | **只读静态侦察** | `invoke_subagent(TypeName="research")` | 纯源码静态阅读与跨目录符号检索（无网络无终端沙盒），返回 `≤50` 行摘要附精确 `file:line`。 |
 | **只读 + CLI 考古/复现** | `invoke_subagent(TypeName="scout")`<br>（[`agents/scout.md`](./agents/scout.md)） | 仅授予 `read_file`、`run_command`、`manage_task`、`search_web`，物理剥离写工具；用于 `why`、`how` 与 Phase 1 失败复现。 |
 | **并行施工与分片流水线** | `invoke_subagent(TypeName="self", Workspace="share" \| "branch")`<br>`run_workflow` | 独立模块编码、回归测试与多语言包同步；单批并发 **≤5 路**，派发后等待系统唤醒，禁止循环轮询。 |
-| **技术顾问 / 方案参谋** | `swarm` (`gemini-4-neon-high`)<br>回退：`invoke_subagent(TypeName="advisor", Model="pro")` | 执行 [`agents/advisor.md`](./agents/advisor.md)：严格只读，提供架构权衡、高风险方案第二意见与卡死重规划，出结论后立即 `swarm kill`。 |
-| **推前独立四维盲审** | `swarm` (`gemini-4-neon-high`)<br>回退：`invoke_subagent(TypeName="reviewer", Model="pro")` | 执行 [`agents/reviewer.md`](./agents/reviewer.md)：不传聊天历史，只读完整 `git diff` 与测试输出，过 4 维审校出 `PASS` 才准 push，结论后立即 `swarm kill`。 |
+| **技术顾问 / 方案参谋** | `swarm` (`gemini-4-neon-high`)<br>回退：`invoke_subagent(TypeName="advisor", Model="pro")` | `brief` 首行强制要求先 `read_file` [`agents/advisor.md`](./agents/advisor.md)：严格只读，提供架构权衡、高风险方案第二意见与卡死重规划，出结论后立即 `swarm kill`。 |
+| **推前独立四维盲审** | `swarm` (`gemini-4-neon-high`；主脑同为 Neon High 的高风险改动切异构模型如 `claude-opus-5-5-high`)<br>回退：`invoke_subagent(TypeName="reviewer", Model="pro")` | `brief` 首行强制要求先 `read_file` [`agents/reviewer.md`](./agents/reviewer.md)：不传聊天历史，只读完整 `git diff` 与测试输出，过 4 维审校出 `PASS` 才准 push，结论后立即 `swarm kill`。 |
 | **极端死锁单回合急救** | `claude-opus-5-5` | 连续两轮修复同一 Bug 失败后立即停手，切过去单回合外科定位根因。 |
 
 详细模型基准对照见 [2026-11 模型选型基准](./docs/benchmarks-2026-11.md)。
@@ -146,8 +152,9 @@ bash scripts/install-skills.sh --target antigravity
 ```text
 .
 ├── plugin.json                        # Antigravity 插件清单
+├── hooks.json                         # PreToolUse 硬防线 Hook 声明
 ├── rules/
-│   └── AGENTS.md                      # 五阶段硬门禁全局规则（已脱敏）
+│   └── AGENTS.md                      # S/M/L 分级 + 五阶段硬门禁全局规则（已脱敏）
 ├── agents/
 │   ├── advisor.md                     # 严格只读技术顾问与方案参谋代理
 │   ├── reviewer.md                    # 严格只读四维独立终审代理
@@ -163,6 +170,9 @@ bash scripts/install-skills.sh --target antigravity
 │   ├── why/
 │   └── ...
 ├── scripts/
+│   ├── guard-hook.mjs                 # PreToolUse 红线硬拦截脚本（支持本地 .privacy-denylist.json）
+│   ├── verify-plugin.mjs              # 插件清单/Frontmatter/SVG/脱敏/链接/Hook 行为自检
+│   ├── sync-workflow.mjs              # 跨平台本地↔公版白名单双向同步（保留本地私有规则）
 │   └── install-skills.sh              # 安装脚本（Antigravity / Claude / Cursor / .agents / Hermes）
 ├── docs/
 │   ├── benchmarks-2026-11.md          # 模型选型基准与角色分工

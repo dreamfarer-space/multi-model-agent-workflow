@@ -14,7 +14,7 @@ Adversaries try to break a change or design. A finding survives **only when an a
 
 ## 2. Fan Out Adversarial Probers (`invoke_subagent`)
 
-Spawn 1 to 2 parallel `invoke_subagent` calls (`TypeName="self"` with `Workspace="branch"` or `"share"` for isolated executable repros, or `TypeName="reviewer"` if purely static + existing-test inspection) with this exact mandate:
+Spawn 1 to 2 parallel `invoke_subagent` calls (`TypeName="self"` with `Workspace="branch"` or `"share"` for isolated executable repros; or dispatch `reviewer` per `AGENTS.md` Section 2 if purely static + existing-test inspection) with this exact mandate:
 
 > Try to break this change. **Do not modify tracked source files in the main working tree** (keep any repro script in an isolated temp/scratch path and clean up, or run read-only/in-memory test probes). Prove each finding with an actual run against the real code—a failing test, repro script, or command output demonstrating wrong behavior. Report each finding with: title, exact command run, actual printed output, and what the intent requires instead. Omit anything you did not actually execute (no style nits, naming opinions, or speculative "what ifs"). "No verified findings" is a valid outcome.
 
