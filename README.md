@@ -22,7 +22,7 @@
 二是**同源模型自改自审**。写代码的模型和对话线程自己点通过，往往看不到漏做的边界、私货改动，或者只测了 mock 的空壳单测。
 
 这个插件仓库直接把约束做进 Antigravity 的原生结构里：
-1. **工具层物理隔离与 `PreToolUse` 硬拦截**：主脑（`Gemini 4 Hydrogen (High)`）只管方案定稿与耦合核心；[`agents/scout.md`](./agents/scout.md) 物理剥离 `edit_file` / `write_file` 权限；根目录 [`hooks.json`](./hooks.json) + [`scripts/guard-hook.mjs`](./scripts/guard-hook.mjs) 在 `PreToolUse` 硬拦截 `Co-Authored-By`、`@codex review`、裸 `git push --force`、`--body-file` UTF-8 BOM 及测试内 `node:vm`/`eval`/`new Function`。
+1. **工具层物理隔离与 `PreToolUse` 硬拦截**：主脑（`Gemini 4 Hydrogen (High)`）只管方案定稿与耦合核心；[`agents/scout.md`](./agents/scout.md) 物理剥离 `edit_file` / `write_file` 权限；根目录 [`hooks.json`](./hooks.json) + [`scripts/guard-hook.mjs`](./scripts/guard-hook.mjs) 在 `PreToolUse` 按真实命令词法硬拦截 `Co-Authored-By`、`@codex review`、裸 `git push --force`/`+ref`、`--body-file` 与 `gh api -F body=@file` 的 UTF-8/UTF-16 BOM 及异常控制字符，以及测试内 `node:vm`/`eval`/`new Function`（不误拦只读 `gh` 或本地临时目录路径）。
 2. **S/M/L 分级快车道 + 五阶段硬门禁（Stage 0 – Stage 4）**：单文件文案/配置走 S 级免仪式快车道；中大型改动走全套门禁——先 `how` + `why` + `architect` 定界（高风险分叉或连修卡死调只读 [`agents/advisor.md`](./agents/advisor.md)），再 `systematic-debugging` + `test-value` + `correct` 施工，推前过 `interrogate` 实证对抗与只读 [`agents/reviewer.md`](./agents/reviewer.md)（默认绑定 `Gemini 4 Neon (High)`；主会话同为 Neon High 且属高风险改动时自动切异构模型）。
 3. **开箱即用与自动校验/同步**：仓库根目录即完整插件包（[`plugin.json`](./plugin.json) + [`hooks.json`](./hooks.json) + [`rules/AGENTS.md`](./rules/AGENTS.md) + [`agents/`](./agents) + 33 个扁平 [`skills/`](./skills)），附带跨平台校验 [`scripts/verify-plugin.mjs`](./scripts/verify-plugin.mjs) 与不覆盖本地私有规则的双向同步 [`scripts/sync-workflow.mjs`](./scripts/sync-workflow.mjs)。
 

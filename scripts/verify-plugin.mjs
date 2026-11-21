@@ -239,10 +239,19 @@ check('guard-hook denies forbidden git/gh/test patterns and allows safe counterp
     }).decision,
     'deny',
   );
-  // Allow: searching for Co-Authored-By
+  // Allow: searching for Co-Authored-By (alone or before a clean commit)
   assert.equal(
     evaluateHookPayload({
       toolCall: { name: 'run_command', args: { CommandLine: 'git grep "Co-Authored-By"' } },
+    }).decision,
+    'allow',
+  );
+  assert.equal(
+    evaluateHookPayload({
+      toolCall: {
+        name: 'run_command',
+        args: { CommandLine: 'git log --grep "Co-Authored-By:" -n 3; git commit -m "fix: clean commit"' },
+      },
     }).decision,
     'allow',
   );
@@ -295,7 +304,87 @@ check('guard-hook denies forbidden git/gh/test patterns and allows safe counterp
     }).decision,
     'deny',
   );
-  // Allow: git push --force-with-lease alone & piped Select-String -f
+  assert.equal(
+    evaluateHookPayload({
+      toolCall: { name: 'run_command', args: { CommandLine: 'git push -uf origin main' } },
+    }).decision,
+    'deny',
+  );
+  assert.equal(
+    evaluateHookPayload({
+      toolCall: { name: 'run_command', args: { CommandLine: 'git -C "/tmp/repo" push origin +HEAD:main' } },
+    }).decision,
+    'deny',
+  );
+  // Deny: wrapped / compound / subshell / substituted / encoded git push & git commit bypasses
+  const encodedForcePush = Buffer.from('git push -f origin main', 'utf16le').toString('base64');
+  for (const wrappedDangerous of [
+    'bash -c "git push --force origin main"',
+    'sh -lc "git push origin +main"',
+    'cmd /c "git push -f origin main"',
+    'powershell -NoProfile -Command "git push -f origin main"',
+    'powershell -Comm "git push -f origin main"',
+    'powershell git push -f origin main',
+    `powershell -enc ${encodedForcePush}`,
+    `powershell -en ${encodedForcePush}`,
+    '(git push -f origin main)',
+    'if ($true) { git push -f origin main }',
+    'if ($true){git push -f origin main}',
+    'if true; then git push -f origin main; fi',
+    'sleep 1 & git push -f origin main',
+    '$r = "$(git push -f origin main)"',
+    '$g="git"; & $g push -f origin main',
+    '$p="push"; git $p -f origin main',
+    '$f="-f"; git push $f origin main',
+    '"git push -f origin main" | iex',
+    'cat <<< x\ngit push -f origin main',
+    'gh pr comment 1 -F - <<< "ok"\ngit push -f origin main',
+    'echo main | xargs git push -f origin',
+    'timeout 60 git push -f origin main',
+    'timeout -k 10 60 git push -f origin main',
+    'nice -n 10 git push -f origin main',
+    'stdbuf -oL git push -f origin main',
+    'wsl -e git push -f origin main',
+    'eval "git push -f origin main"',
+    'iex "git push -f origin main"',
+    'Invoke-Expression -Command "git push -f origin main"',
+    'bash -c "git commit -m \'fix\\n\\nCo-Authored-By: Bot <b@x.io>\'"',
+    'git commit --tra "Co-Authored-By: Bot <b@x.io>" -m "fix"',
+    'gh api repos/{owner}/{repo}/issues/1/comments -f body="@codex review"',
+  ]) {
+    assert.equal(
+      evaluateHookPayload({
+        toolCall: { name: 'run_command', args: { CommandLine: wrappedDangerous } },
+      }).decision,
+      'deny',
+      `Expected deny for wrapped dangerous command: ${wrappedDangerous}`,
+    );
+  }
+  // Deny: combined / attached / abbreviated flags, gh api {owner}/{repo}, and <<< here-strings
+  for (const shortFlagLeak of [
+    'git commit -am "fix SECRET_LOCAL_TOKEN_XYZ"',
+    'git commit -sm "fix SECRET_LOCAL_TOKEN_XYZ"',
+    'git commit -m"fix SECRET_LOCAL_TOKEN_XYZ"',
+    'git commit --m "fix SECRET_LOCAL_TOKEN_XYZ"',
+    'git commit --me "fix SECRET_LOCAL_TOKEN_XYZ"',
+    'git commit --m=SECRET_LOCAL_TOKEN_XYZ',
+    'git commit --mess "fix SECRET_LOCAL_TOKEN_XYZ"',
+    'git commit -F - <<< "fix SECRET_LOCAL_TOKEN_XYZ"',
+    'gh pr comment 1 -b"host SECRET_LOCAL_TOKEN_XYZ"',
+    'gh pr comment 1 -F - <<< "host SECRET_LOCAL_TOKEN_XYZ"',
+    'gh api -XPATCH repos/o/r/issues/comments/1 -fbody="SECRET_LOCAL_TOKEN_XYZ"',
+    'gh api repos/{owner}/{repo}/issues/1/comments -f body="SECRET_LOCAL_TOKEN_XYZ"',
+  ]) {
+    assert.equal(
+      evaluateHookPayload(
+        { toolCall: { name: 'run_command', args: { CommandLine: shortFlagLeak } } },
+        { privacyDenylist: ['SECRET_LOCAL_TOKEN_XYZ'] },
+      ).decision,
+      'deny',
+      `Expected deny for short-flag privacy leak: ${shortFlagLeak}`,
+    );
+  }
+  // Allow: git push --force-with-lease alone, piped Select-String -f, and node -e matching old regex (git + .push + +=)
   assert.equal(
     evaluateHookPayload({
       toolCall: { name: 'run_command', args: { CommandLine: 'git push --force-with-lease=refs/heads/feat:abc123 origin feat' } },
@@ -308,22 +397,39 @@ check('guard-hook denies forbidden git/gh/test patterns and allows safe counterp
     }).decision,
     'allow',
   );
+  assert.equal(
+    evaluateHookPayload({
+      toolCall: {
+        name: 'run_command',
+        args: {
+          CommandLine: 'node -e "execSync(\'git ls-files\'); count += 1; arr.push(a +b); console.log(arr)"',
+        },
+      },
+    }).decision,
+    'allow',
+  );
 
-  // Deny / Allow: --body-file & -F BOM check, @codex review in file, privacy denylist (ignoring path flags)
+  // Deny / Allow: --body-file, -F, gh api -F body=@file (UTF-8 BOM, UTF-16LE BOM, NUL/control chars, @codex, privacy)
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'wf-guard-test-'));
   try {
     const bomFile = path.join(tmpDir, 'bom.md');
+    const utf16File = path.join(tmpDir, 'utf16le.md');
+    const ctrlFile = path.join(tmpDir, 'ctrl.md');
     const cleanFile = path.join(tmpDir, 'clean.md');
     const leakFile = path.join(tmpDir, 'leak.md');
     const codexFile = path.join(tmpDir, 'codex.md');
     const userPathDir = path.join(tmpDir, 'SECRET_LOCAL_USER');
     fs.mkdirSync(userPathDir, { recursive: true });
     const cleanInUserPath = path.join(userPathDir, 'pr.md');
+    const leakInUserPath = path.join(userPathDir, 'leak-commit.txt');
     fs.writeFileSync(bomFile, Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from('## Summary\n', 'utf8')]));
+    fs.writeFileSync(utf16File, Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from('## 摘要\n', 'utf16le')]));
+    fs.writeFileSync(ctrlFile, Buffer.from('## Summary\nBroken \x07bell control char\n', 'utf8'));
     fs.writeFileSync(cleanFile, '## Summary\nClean PR body.\n', 'utf8');
     fs.writeFileSync(leakFile, '## Summary\nLeaked SECRET_LOCAL_TOKEN_XYZ\n', 'utf8');
     fs.writeFileSync(codexFile, 'Please run @codex review on this PR.\n', 'utf8');
     fs.writeFileSync(cleanInUserPath, '## Summary\nClean content inside private temp path.\n', 'utf8');
+    fs.writeFileSync(leakInUserPath, 'fix: leaked SECRET_LOCAL_TOKEN_XYZ\n', 'utf8');
 
     assert.equal(
       evaluateHookPayload({
@@ -342,7 +448,91 @@ check('guard-hook denies forbidden git/gh/test patterns and allows safe counterp
     assert.equal(
       evaluateHookPayload({
         cwd: tmpDir,
+        toolCall: { name: 'run_command', args: { CommandLine: 'gh pr edit 1 --body-file utf16le.md' } },
+      }).decision,
+      'deny',
+    );
+    assert.equal(
+      evaluateHookPayload({
+        cwd: tmpDir,
+        toolCall: { name: 'run_command', args: { CommandLine: 'gh pr edit 1 --body-file ctrl.md' } },
+      }).decision,
+      'deny',
+    );
+    assert.equal(
+      evaluateHookPayload({
+        cwd: tmpDir,
+        toolCall: {
+          name: 'run_command',
+          args: { CommandLine: 'gh api repos/{owner}/{repo}/issues/1/comments -F body=@bom.md' },
+        },
+      }).decision,
+      'deny',
+    );
+    assert.equal(
+      evaluateHookPayload(
+        {
+          cwd: tmpDir,
+          toolCall: {
+            name: 'run_command',
+            args: { CommandLine: `git commit --fil="${leakInUserPath}"` },
+          },
+        },
+        { privacyDenylist: ['SECRET_LOCAL_TOKEN_XYZ'] },
+      ).decision,
+      'deny',
+    );
+    assert.equal(
+      evaluateHookPayload({
+        cwd: tmpDir,
+        toolCall: {
+          name: 'run_command',
+          args: { CommandLine: 'gh api -X PATCH repos/o/r/issues/comments/1 -F body=@utf16le.md' },
+        },
+      }).decision,
+      'deny',
+    );
+    assert.equal(
+      evaluateHookPayload(
+        {
+          cwd: tmpDir,
+          toolCall: {
+            name: 'run_command',
+            args: {
+              CommandLine: `$comment = '${utf16File}'; $arg = "body=@$comment"; gh api -X PATCH repos/o/r/issues/comments/1 -F $arg`,
+            },
+          },
+        },
+        { privacyDenylist: ['SECRET_LOCAL_USER'] },
+      ).decision,
+      'deny',
+    );
+    assert.equal(
+      evaluateHookPayload(
+        {
+          cwd: tmpDir,
+          toolCall: {
+            name: 'run_command',
+            args: {
+              CommandLine: `$comment = '${cleanInUserPath}'; gh api -X PATCH repos/o/r/issues/comments/1 -F "body=@$comment"`,
+            },
+          },
+        },
+        { privacyDenylist: ['SECRET_LOCAL_USER'] },
+      ).decision,
+      'allow',
+    );
+    assert.equal(
+      evaluateHookPayload({
+        cwd: tmpDir,
         toolCall: { name: 'run_command', args: { CommandLine: 'gh pr comment 1 --body-file codex.md' } },
+      }).decision,
+      'deny',
+    );
+    assert.equal(
+      evaluateHookPayload({
+        cwd: tmpDir,
+        toolCall: { name: 'run_command', args: { CommandLine: "gh pr comment 1 -F - <<'EOF'\nPlease @codex review\nEOF" } },
       }).decision,
       'deny',
     );
@@ -358,6 +548,53 @@ check('guard-hook denies forbidden git/gh/test patterns and allows safe counterp
         {
           cwd: tmpDir,
           toolCall: { name: 'run_command', args: { CommandLine: 'gh pr edit 1 --body-file leak.md' } },
+        },
+        { privacyDenylist: ['SECRET_LOCAL_TOKEN_XYZ'] },
+      ).decision,
+      'deny',
+    );
+    // Allow: read-only gh commands & multi-statement scratch variables containing local username path
+    assert.equal(
+      evaluateHookPayload(
+        {
+          cwd: tmpDir,
+          toolCall: {
+            name: 'run_command',
+            args: {
+              CommandLine: `$scratch = '${userPathDir}'; gh pr diff 42 > "$scratch\\pr42.diff"; gh pr view 42 --json body`,
+            },
+          },
+        },
+        { privacyDenylist: ['SECRET_LOCAL_USER'] },
+      ).decision,
+      'allow',
+    );
+    assert.equal(
+      evaluateHookPayload(
+        {
+          cwd: tmpDir,
+          toolCall: {
+            name: 'run_command',
+            args: {
+              CommandLine: `$p = '${cleanInUserPath}'; node -e "console.log('${cleanInUserPath.replace(/\\/g, '/')}')" ; gh pr create --title "ok" --body-file $p`,
+            },
+          },
+        },
+        { privacyDenylist: ['SECRET_LOCAL_USER'] },
+      ).decision,
+      'allow',
+    );
+    // Deny: resolved variable passed as inline --body or PowerShell here-string with odd apostrophe
+    assert.equal(
+      evaluateHookPayload(
+        {
+          cwd: tmpDir,
+          toolCall: {
+            name: 'run_command',
+            args: {
+              CommandLine: `$body = @'\ndon't leak SECRET_LOCAL_TOKEN_XYZ\n'@\ngh pr comment 1 --body $body`,
+            },
+          },
         },
         { privacyDenylist: ['SECRET_LOCAL_TOKEN_XYZ'] },
       ).decision,
@@ -389,6 +626,75 @@ check('guard-hook denies forbidden git/gh/test patterns and allows safe counterp
       ).decision,
       'allow',
     );
+    assert.equal(
+      evaluateHookPayload(
+        {
+          cwd: tmpDir,
+          toolCall: {
+            name: 'run_command',
+            args: { CommandLine: `$msg = '${leakInUserPath}'; git commit -F $msg` },
+          },
+        },
+        { privacyDenylist: ['SECRET_LOCAL_TOKEN_XYZ', 'SECRET_LOCAL_USER'] },
+      ).decision,
+      'deny',
+    );
+    // Deny: same-command redirection / Out-File / Set-Content into gh payload file & @codex review before gh
+    for (const sameCmdWrite of [
+      'echo "@codex review" > generated.md; gh pr comment 1 -F generated.md',
+      'echo "hello" > generated.md; gh pr edit 1 --body-file generated.md',
+      'Write-Output "hi" | Out-File generated.md; gh api -X PATCH repos/o/r/issues/comments/1 -F body=@generated.md',
+      'Set-Content -Path generated.md -Value "hi"; gh pr create --title "t" --body-file generated.md',
+    ]) {
+      assert.equal(
+        evaluateHookPayload({
+          cwd: tmpDir,
+          toolCall: { name: 'run_command', args: { CommandLine: sameCmdWrite } },
+        }).decision,
+        'deny',
+        `Expected deny for same-command file write into gh: ${sameCmdWrite}`,
+      );
+    }
+    // Deny: input redirection `< file` into gh -F - (BOM / privacy)
+    assert.equal(
+      evaluateHookPayload({
+        cwd: tmpDir,
+        toolCall: { name: 'run_command', args: { CommandLine: 'gh pr comment 1 -F - < bom.md' } },
+      }).decision,
+      'deny',
+    );
+    assert.equal(
+      evaluateHookPayload(
+        {
+          cwd: tmpDir,
+          toolCall: { name: 'run_command', args: { CommandLine: 'gh pr comment 1 -F - < leak.md' } },
+        },
+        { privacyDenylist: ['SECRET_LOCAL_TOKEN_XYZ'] },
+      ).decision,
+      'deny',
+    );
+    // Deny: process.env variable expansion ($env:VAR / %VAR% / $VAR) resolves BOM file
+    const prevEnv = process.env.WF_GUARD_TEST_TMP;
+    process.env.WF_GUARD_TEST_TMP = tmpDir;
+    try {
+      assert.equal(
+        evaluateHookPayload({
+          cwd: tmpDir,
+          toolCall: { name: 'run_command', args: { CommandLine: 'gh pr create --title "t" --body-file "$env:WF_GUARD_TEST_TMP/bom.md"' } },
+        }).decision,
+        'deny',
+      );
+      assert.equal(
+        evaluateHookPayload({
+          cwd: tmpDir,
+          toolCall: { name: 'run_command', args: { CommandLine: 'gh pr create --title "t" --body-file "%WF_GUARD_TEST_TMP%\\utf16le.md"' } },
+        }).decision,
+        'deny',
+      );
+    } finally {
+      if (prevEnv === undefined) delete process.env.WF_GUARD_TEST_TMP;
+      else process.env.WF_GUARD_TEST_TMP = prevEnv;
+    }
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
