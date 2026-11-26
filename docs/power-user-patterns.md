@@ -16,7 +16,7 @@
    - 陌生模块先跑 **`how`**（调 `research` / `scout`）梳理调用链与状态归属，拿到 onboarding 级心智模型。
    - 改动旧逻辑、重试/超时或防错保护前先跑 **`why`**（`git blame` / `git log` / `gh pr view`），严格区分“已验证事实”与“合理推断”，避免顺手删掉历史踩坑留下的刻意防御。
 3. **`architect`（Design It Twice）+ `grill-me`（Frontier Rounds）**：
-   - 非平凡跨模块改动先用 **`architect`** 写出**至少两套结构截然不同的骨架**（先写类型、签名与调用示例，`not implemented` 占位），过一遍 `design-red-flags` 再定稿；如果施工中出现大量绕路、`any` 强转或意外锁，立刻停下推翻骨架重来，不在错误结构上堆补丁。
+   - 非平凡跨模块改动先用 **`architect`** 写出**至少两套结构截然不同的骨架**（先写类型、签名与调用示例，`not implemented` 占位），过一遍 `design-red-flags` 再定稿；仅当从零设计全新并发锁、分布式状态机或多端协议时，可选用 **`statechart`** 在写码前用 TLA+/TLC 先验状态转移（日常开发不作必选）。如果施工中出现大量绕路、`any` 强转或意外锁，立刻停下推翻骨架重来，不在错误结构上堆补丁。
    - 需求或环境术语存在分叉时，用 **`grill-me`**（配合 `ask_question` 或 `/grill-me`）按依赖树只提问前置条件已定死的“前沿节点（Frontier）”，每题附带推荐答案与一句话理由；能从源码和命令查清的事实一律自己查，不打扰用户。
    - 开工前明确**单 PR 单目标**与 **`Out of Scope`（禁止触碰的文件与模块）**。
 
@@ -32,7 +32,9 @@
 
 ### Stage 2 · 本地门禁与独立终审（Local Gates & Pre-Push Audit）
 1. **同步基线与全量本地验证**：先 `git fetch && git rebase` 对齐上游基线、重编受影响产物，再**串行**跑通目标仓库 `check` / `typecheck` / `lint` / 受影响测试（严禁多个构建或原生 prebuild 并发争抢）。
-2. **实证对抗探测（`interrogate`）**：高风险并发、权限、协议或状态机改动，派出 `invoke_subagent(TypeName="self", Workspace="branch"|"share")` 对抗侦察尝试击穿改动——**只有真实执行命令或复现脚本跑出来的失败才算数**，无执行证据的猜测一律丢弃。
+2. **实证对抗与爆破半径前置门禁（`interrogate` / `blast-radius`）**：
+   - 改动共享协议、序列化边界、加密/传输契约或跨包底层接口时，先过 **`blast-radius`**（至少推进至第 4 级：调用真实代码的最小实跑脚本验证核心安全假设）。
+   - L 级涉及并发、权限、安全边界、锁、重连或状态机流转时，派出 `invoke_subagent(TypeName="self", Workspace="branch"|"share")` 跑 **`interrogate`** 对抗侦察尝试击穿改动——**只有真实执行命令或复现脚本跑出来的失败才算数**，无执行证据的猜测一律丢弃；实跑证据须随 diff 与测试输出一并交给 `reviewer`，缺实证证据不得 `PASS`。
 3. **强制推前独立四维终审（`reviewer`）**：
    - 凡改动 **≥2 个源码文件**，或涉及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 或开 PR 前**必须**由独立只读 `reviewer`（默认 `swarm` `gemini-4-neon-high`，主脑本身为 Neon High 的高风险改动切异构模型如 `claude-opus-5-5-high`；`brief` 首行必须显式要求先 `read_file` `agents/reviewer.md`；不可用时退回 `invoke_subagent(TypeName="reviewer", Model="pro")`）审查，输入**仅限需求边界 + 完整 `git diff` + 本地测试输出**（不传对话历史）：
      1. **边界与私货（Scope Drift）**：是否偷渡未要求的新功能、多余开关或顺手重构；
@@ -75,7 +77,7 @@
    - 100+ 次/天的高频操作（切 Tab、开关软键盘、命令面板）**严禁加动画**；其余动效 ≤300ms、用强 `ease-out`；RN 手势留在 UI Worklet 线程。
    - Web `:hover` 必须包在 `@media (hover: hover) and (pointer: fine)` 中，输入框字号 ≥16px，全屏用 `100dvh`。
 2. **四步递进验证**：
-   - **Step 1（无头状态机 / TLA+）**：用乱序状态脚本或 **`statechart`**（SANY + TLC）生成 Mermaid 状态图与最短反例路径。
+   - **Step 1（无头状态脚本；重型协议可选 `statechart`）**：优先用轻量无头状态脚本跑通乱序事件与边界流转；仅在设计全新复杂多方协议或并发状态机时，可选用 **`statechart`**（SANY + TLC）生成 Mermaid 状态图与最短反例路径。
    - **Step 2（`break-ui` 极限脏数据）**：注入长德语词、超长邮箱、`0 / 1 / 1,000+` 条集合与 `tabular-nums`，提前暴露 Flex 溢出与折行崩坏。
    - **Step 3（结构树与几何坐标）**：Android 抓取 `uiautomator dump` 检查 `bounds`，Web 检查 `getBoundingClientRect()` 与 `scrollWidth > clientWidth`。
    - **Step 4（静止态截图验收）**：动画静止后截取明/暗色画面交主模型核验。

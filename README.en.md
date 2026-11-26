@@ -91,7 +91,7 @@ Enforced in [`rules/AGENTS.md`](./rules/AGENTS.md) and unpacked in [Engineering 
 
 1. **Stage 0 · Scope & Grounding**: Check target `AGENTS.md` and upstream baseline, **never branch directly in the main workspace** (use an isolated `git worktree`); ground with `how` and `why` before touching safeguards, sketch two distinct shapes with `architect`, and lock decisions + `Out of Scope` with `grill-me` / `ask_question`.
 2. **Stage 1 · Locate, Implement & Guard**: Build a tight failing loop first with `systematic-debugging` (or throwaway `spike`); follow `test-value` (**strict ban on `node:vm` / `eval` / `new Function` in tests**); fix recurring mistake classes at the highest effective level with `correct` (Architecture → Types → Lint → Behavioral Tests → Docs); trim accidental complexity with `simplify-codebase`.
-3. **Stage 2 · Local Gates & Pre-Push Audit**: Fetch and rebase onto upstream, rebuild artifacts, and run local checks/tests sequentially; run `interrogate` on high-risk concurrency/auth/protocol edits (only command-proven findings survive); trigger read-only `reviewer` whenever ≥2 source files or state-machine/permission/security/IPC/redaction paths change.
+3. **Stage 2 · Local Gates & Pre-Push Audit**: Fetch and rebase onto upstream, rebuild artifacts, and run local checks/tests sequentially; run `blast-radius` (to at least Level 4 executed script proof) on shared protocol/contract edits and `interrogate` (only command-proven findings survive) on high-risk L-tier concurrency/auth/lock/state-machine edits, passing that proof to `reviewer`; trigger read-only `reviewer` whenever ≥2 source files or state-machine/permission/security/IPC/redaction paths change.
 4. **Stage 3 · Clean PR Delivery**: Follow repository templates (`yeet` / `github`), write `--body-file` in **BOM-free UTF-8**, match the repo's primary language, never add AI `Co-Authored-By` trailers or unsolicited review bots, and keep screenshots redacted and out of source branches.
 5. **Stage 4 · Post-Push CI & Review Loop**: Inspect `gh pr view --json mergeStateStatus` immediately (rebase if `DIRTY` so CI isn't skipped), shepherd `gh pr checks` + `gh-fix-ci`, and resolve feedback via `gh-address-comments` by replying in-thread and executing GraphQL `resolveReviewThread`, cleaning up branches with `--delete-branch` after merge.
 
@@ -122,7 +122,7 @@ All skills live flat under [`skills/`](./skills). See [`THIRD_PARTY_NOTICES.md`]
 | | `python-debugpy` | Debugs Python via `pdb` REPL and `debugpy` DAP | MIT (`Nous Research`) |
 | **Stage 2 · Proof & Verification** | `interrogate` | Adversarial probers break changes; only executed repros survive | MIT (Adapted) |
 | | `blast-radius` | Cross-module blast radius audit and 5-level evidence ladder | MIT (`cursor/plugins/pstack`) |
-| | `statechart` | Compiles TLA+ specs into Mermaid statecharts and counterexamples | MIT (`cursor/plugins/pstack`) |
+| | `statechart` | (Optional Stage 0 heavy weapon) Compiles TLA+ specs for brand-new concurrent locks/protocols | MIT (`cursor/plugins/pstack`) |
 | | `benchmark-checklist` | 7-point gate against unverified performance claims | MIT (`cursor/plugins/pstack`) |
 | **Stage 3 & 4 · PR & CI Loop** | `yeet` | Stage, commit, push, and open/update GitHub PRs cleanly | Apache-2.0 (`OpenAI / Codex`, sanitized) |
 | | `github` | `gh` CLI hub for issues, reviews, repos, auth, and releases | MIT (`Nous Research`, sanitized) |

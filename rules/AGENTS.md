@@ -30,14 +30,17 @@
 
 1. **阶段 0 · 接单立界**：
    - 先核对目标仓库 `AGENTS.md` / `CONTRIBUTING.md`、当前分支与 `upstream/main`（或 `origin/main`）基线；M/L 级任务**禁止直接在主工作区切开发分支**，新建独立 `git worktree` 或用隔离工作区再动手。
-   - 陌生模块先跑 **`how`** 梳理调用链；改旧逻辑或防错保护前先跑 **`why`** 查清历史 PR/设计意图，避免误删刻意保护；非平凡跨模块设计先跑 **`architect`**（出两版骨架再定稿，大型需求拆分为可独立合入的小 PR）；需求或术语存在分叉时先用 **`grill-me`**（配合 `ask_question` 或 `/grill-me`）锁死边界。
+   - 陌生模块先跑 **`how`** 梳理调用链；改旧逻辑或防错保护前先跑 **`why`** 查清历史 PR/设计意图，避免误删刻意保护；非平凡跨模块设计先跑 **`architect`**（出两版骨架再定稿，大型需求拆分为可独立合入的小 PR；仅当从零设计全新并发锁、分布式状态机或多端协议时，可选用 **`statechart`** 先以 TLA+/TLC 校验状态转移不变量，日常开发不作必选）；需求或术语存在分叉时先用 **`grill-me`**（配合 `ask_question` 或 `/grill-me`）锁死边界。
    - 明确**单 PR 单目标**与 `Out of Scope`（禁止把无关 UI 美化、功能重构或未要求的新开关捆进同一 PR）。
 2. **阶段 1 · 定位与施工**：
    - 修 Bug 先建最小失败复现（`systematic-debugging`）；未知可行性先做一次性实验（`spike`）；写测试遵循 `test-value`（保护真实行为、不测纯 mock；**严禁在测试引入 `node:vm` / `eval` / `new Function`**，内联脚本逻辑必须抽离导出纯函数直测）。
    - 安全敏感或跨边界改动对照 `security-best-practices`；大块结构精简用 `simplify-codebase`；遇反复犯的同类错时用 **`correct`** 按“架构 → 类型 → Lint/Hook → 行为测试 → 文档”最高有效层级固化防呆；跨模块排查或独立子任务优先用 `invoke_subagent`（`research` / `scout` / `self`），不超过 5 路并发。
 3. **阶段 2 · 本地门禁与独立审核（Push 前硬闸门）**：
-   - 先完成上游基线同步（`git fetch && git rebase`）与产物重编，再串行跑通目标仓库本地门禁与受影响测试；高风险并发/权限/协议改动加跑 **`interrogate`** 做实证破坏测试。
-   - **强制独立审核**：凡改动 **≥2 个源码文件** 或涉及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 或建 PR 前**必须**按第 2 节 `reviewer` 路由规范执行独立终审，传入需求边界、完整 `git diff` 与本地测试输出，核查：**① 是否偏离维护者/用户边界（未擅自加功能或扩散改动面） ② 安全、脱敏、竞态与边界漏洞 ③ 是否残留废话注释、注释死代码或无正当外因的 `@ts-ignore` / `@ts-expect-error` / `eslint-disable` 绕过标记**。未过审不得 push；涉及逻辑/安全/状态机的 rebase 或审核后改动必须重跑受影响检查并递增名称（`reviewer-r2`…）复审；同 PR 已过审后的纯 UI 样式/文案小微调（不触及状态机、权限、安全、协议、IPC 或业务逻辑）可仅跑受影响检查与单测，免每次微调重开全量异构终审。
+   - 先完成上游基线同步（`git fetch && git rebase`）与产物重编，再串行跑通目标仓库本地门禁与受影响测试。
+   - **实证深验前置条件（低成本硬门禁，避免只看 diff 漏测）**：
+     - 改动共享协议、序列化边界、加密/传输契约或跨包底层接口时，加跑 **`blast-radius`**（至少推进至第 4 级：用调用真实代码的最小脚本证明核心安全假设）。
+     - L 级改动涉及权限、安全边界、并发锁、重连或状态机流转时，必须加跑 **`interrogate`** 做实证破坏探测，并将**真实命令/复现输出**作为输入材料一并交给 `reviewer`。
+   - **强制独立审核**：凡改动 **≥2 个源码文件** 或涉及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 或建 PR 前**必须**按第 2 节 `reviewer` 路由规范执行独立终审，传入需求边界、完整 `git diff`、本地测试输出（及上述 L 级/共享契约改动所需的 `interrogate` / `blast-radius` 实跑证据），核查：**① 是否偏离维护者/用户边界（未擅自加功能或扩散改动面） ② 安全、脱敏、竞态与边界漏洞（高风险项缺实证探测证据不予放行） ③ 是否残留废话注释、注释死代码或无正当外因的 `@ts-ignore` / `@ts-expect-error` / `eslint-disable` 绕过标记**。未过审不得 push；涉及逻辑/安全/状态机的 rebase 或审核后改动必须重跑受影响检查并递增名称（`reviewer-r2`…）复审；同 PR 已过审后的纯 UI 样式/文案小微调（不触及状态机、权限、安全、协议、IPC 或业务逻辑）可仅跑受影响检查与单测，免每次微调重开全量异构终审。
 4. **阶段 3 · 规范提 PR**：
    - 若目标仓库有专属贡献/PR 规范（`CONTRIBUTING.md`、`AGENTS.md` 或专用 Skill）优先遵守；其余仓库走 **`yeet`**（通用 issue/仓库/release/auth 查 **`github`**）。
    - 通用红线（已由插件根 `hooks.json` + `scripts/guard-hook.mjs` 在 `PreToolUse` 硬拦截）：仓库 `user.email` 保持一致；匹配目标仓库主要语言；严禁添加 AI `Co-Authored-By`；严禁擅自触发 `@codex review` 等自动审查机器人；严禁裸 `git push --force`/`-f`；PR 正文、Issue 评论与 `gh api -F body=@file` 载荷一律以 `write_file` 新建或 Node `fs.writeFileSync(..., 'utf8')` 写为**无 BOM UTF-8**（**严禁使用 PowerShell `>` 重定向产生 UTF-16LE 或双引号 here-string `@"..."@` 转义 Markdown 反引号**）。

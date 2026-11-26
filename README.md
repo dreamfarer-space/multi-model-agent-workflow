@@ -93,7 +93,7 @@ node scripts/verify-plugin.mjs
 
 1. **Stage 0 · 接单立界**：核对目标仓 `AGENTS.md` 与上游基线，**禁止在主工作区直接切分支**（必建独立 `worktree`）；先跑 `how` 摸清调用链，改旧防御逻辑前跑 `why` 查 git/PR 历史意图，跨模块先用 `architect` 画两套骨架，分叉需求用 `grill-me`（配合 `ask_question`）锁死边界与 `Out of Scope`。
 2. **Stage 1 · 定位与施工**：修 Bug 先跑 `systematic-debugging` 建最小失败复现，未知可行性先做一次性 `spike`；写测试遵守 `test-value`（答清“什么错会挂 / 会不会误伤重构 / 是否有重复覆盖”，**严禁在测试中引入 `node:vm` / `eval` / `new Function`**）；重复踩过的坑用 `correct` 按“架构 → 类型 → Lint → 行为测试 → 文档”最高层级固化；冗余代码用 `simplify-codebase` 按证据删减。
-3. **Stage 2 · 本地门禁与独立终审**：先 `git fetch && git rebase` 对齐基线并重编产物，串行跑通 `check` 与测试；高风险并发/权限/协议改动加跑 `interrogate`（只保留真实命令复现出来的缺陷）；改动 **≥2 个源码文件**或触及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 前强制调用 `reviewer` 过四维盲审（边界私货、安全与脱敏、`test-value` 鉴别力、废话注释与 `@ts-ignore`/`eslint-disable` 清理）。
+3. **Stage 2 · 本地门禁与独立终审**：先 `git fetch && git rebase` 对齐基线并重编产物，串行跑通 `check` 与测试；改动共享协议/跨包契约加跑 `blast-radius`（至少推进至第 4 级实跑脚本证明安全假设），L 级并发/权限/锁/状态机改动加跑 `interrogate`（只保留真实命令复现出来的缺陷）并随测试输出一并交给 `reviewer`；改动 **≥2 个源码文件**或触及 **状态机 / 权限 / 安全 / 协议 / IPC / 日志脱敏**，push 前强制调用 `reviewer` 过四维盲审（边界私货、安全与脱敏、`test-value` 鉴别力、废话注释与 `@ts-ignore`/`eslint-disable` 清理）。
 4. **Stage 3 · 规范提 PR**：匹配目标仓库主语言与 PR 模板（`yeet` / `github`），正文一律写为**无 BOM UTF-8** `--body-file` 提交；严禁添加 AI `Co-Authored-By` 或擅自触发自动审查机器人；调试截图禁入源码主干且严禁暴露本机用户名与绝对路径。
 5. **Stage 4 · 推后巡检与评论闭环**：push 后立刻查 `gh pr view --json mergeStateStatus`（遇 `DIRTY` 立即解冲突重推防跳过 CI）与 `gh pr checks`（失败走 `gh-fix-ci`）；收到评审意见走 `gh-address-comments` 在原 thread 回复并显式执行 GraphQL `resolveReviewThread`，合入后用 `--delete-branch` 清理分支。
 
@@ -124,7 +124,7 @@ node scripts/verify-plugin.mjs
 | | `python-debugpy` | 使用 `pdb` 与 `debugpy`（DAP）排查 Python 运行态问题 | MIT (`Nous Research`) |
 | **Stage 2 · 实证与机器验证** | `interrogate` | 派出对抗探测子智能体实跑击穿改动，仅留有命令证据的缺陷 | MIT (Adapted) |
 | | `blast-radius` | 评估跨模块修改爆破半径，建立运行期 5 级证据梯 | MIT (`cursor/plugins/pstack`) |
-| | `statechart` | 用 SANY 与 TLC 将 TLA+ 规格编译为 Mermaid 状态图与反例链 | MIT (`cursor/plugins/pstack`) |
+| | `statechart` | （Stage 0 重型可选）全新并发锁/协议设计期用 SANY 与 TLC 生成 Mermaid 状态图与反例链 | MIT (`cursor/plugins/pstack`) |
 | | `benchmark-checklist` | 性能汇报前的 7 项防夸大与可复现基准核查清单 | MIT (`cursor/plugins/pstack`) |
 | **Stage 3 & 4 · PR 与 CI 闭环** | `yeet` | 按目标仓库规范暂存、提交、推送并创建/更新 PR | Apache-2.0 (`OpenAI / Codex`, sanitized) |
 | | `github` | `gh` CLI 通用运维中心（Issue、Review、Release、Auth） | MIT (`Nous Research`, sanitized) |
